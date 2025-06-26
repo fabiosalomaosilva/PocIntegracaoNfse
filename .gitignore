@@ -347,6 +347,50 @@ MigrationBackup/
 FodyWeavers.xsd
 
 ##
+## Blazor specific
+##
+
+# Blazor WebAssembly
+wwwroot/dist/
+wwwroot/_framework/
+wwwroot/_content/
+
+# Blazor Server
+blazor-server-side/
+**/blazor.server.js
+**/blazor.webassembly.js
+
+# Service Worker
+wwwroot/service-worker-assets.js
+wwwroot/sw.js
+
+# PWA files
+wwwroot/manifest.json
+wwwroot/icon-*.png
+
+# Hot Reload
+**/.dotnet/
+
+##
+## ASP.NET Core specific
+##
+
+# User secrets
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/secrets.json
+
+# SSL certificates
+**/*.pfx
+**/*.p12
+**/*.crt
+**/*.key
+**/*.pem
+
+# Entity Framework
+**/Migrations/
+
+##
 ## Visual studio for Mac
 ##
 
