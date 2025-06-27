@@ -23,7 +23,7 @@
                           Label="CEP"
                           Placeholder="00000-000"
                           Variant="Variant.Outlined"
-                          FullWidth="true"
+                          
                           OnBlur="@OnCEPChange"
                           Validation="@(new Func<string, string?>(ValidateCEP))"
                           Immediate="true" />
@@ -34,7 +34,7 @@
                           Label="Código Município (IBGE)"
                           Placeholder="0000000"
                           Variant="Variant.Outlined"
-                          FullWidth="true"
+                          
                           Required="@IsRequired"
                           Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))"
                           MaxLength="7" />
@@ -44,7 +44,7 @@
             <MudSelect @bind-Value="UF"
                        Label="UF"
                        Variant="Variant.Outlined"
-                       FullWidth="true"
+                       
                        Required="@IsRequired">
                 @foreach (var uf in Enum.GetValues<UnidadeFederacao>())
                 {
@@ -61,7 +61,7 @@
                           Label="Código País (ISO)"
                           Placeholder="BR"
                           Variant="Variant.Outlined"
-                          FullWidth="true"
+                          
                           Required="@IsRequired"
                           MaxLength="2"
                           Validation="@(new Func<string, string?>(ValidateCodigoPais))" />
@@ -72,7 +72,7 @@
                           Label="Código Postal"
                           Placeholder="Código postal do país"
                           Variant="Variant.Outlined"
-                          FullWidth="true"
+                          
                           Required="@IsRequired"
                           MaxLength="11" />
         </MudItem>
@@ -82,7 +82,7 @@
                           Label="Cidade"
                           Placeholder="Nome da cidade"
                           Variant="Variant.Outlined"
-                          FullWidth="true"
+                          
                           Required="@IsRequired"
                           MaxLength="60" />
         </MudItem>
@@ -92,7 +92,7 @@
                           Label="Estado/Província"
                           Placeholder="Estado, província ou região"
                           Variant="Variant.Outlined"
-                          FullWidth="true"
+                          
                           Required="@IsRequired"
                           MaxLength="60" />
         </MudItem>
@@ -104,7 +104,7 @@
                       Label="Logradouro"
                       Placeholder="Rua, Avenida, Travessa, etc."
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       Required="@IsRequired"
                       MaxLength="255"
                       Validation="@(new Func<string, string?>(ValidateLogradouro))" />
@@ -115,7 +115,7 @@
                       Label="Número"
                       Placeholder="123, S/N, etc."
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       Required="@IsRequired"
                       MaxLength="60"
                       Validation="@(new Func<string, string?>(ValidateNumero))" />
@@ -126,7 +126,7 @@
                       Label="Complemento"
                       Placeholder="Apto, Sala, Bloco, etc."
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       MaxLength="156" />
     </MudItem>
     <!-- Bairro -->
@@ -135,7 +135,7 @@
                       Label="Bairro"
                       Placeholder="Nome do bairro"
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       Required="@IsRequired"
                       MaxLength="60"
                       Validation="@(new Func<string, string?>(ValidateBairro))" />

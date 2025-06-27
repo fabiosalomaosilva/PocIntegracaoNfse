@@ -33,7 +33,7 @@
                               Label="CNPJ"
                               Placeholder="00.000.000/0000-00"
                               Variant="Variant.Outlined"
-                              FullWidth="true"
+                              
                               OnBlur="@(async () => await OnCNPJChange(Model.CNPJ))"
                               Validation="@(new Func<string, string?>(ValidateCNPJ))"
                               Immediate="true" />
@@ -43,7 +43,7 @@
                               Label="CPF"
                               Placeholder="000.000.000-00"
                               Variant="Variant.Outlined"
-                              FullWidth="true"
+                              
                               OnBlur="@(async () => await OnCPFChange(Model.CPF))"
                               Validation="@(new Func<string, string?>(ValidateCPF))"
                               Immediate="true" />
@@ -53,14 +53,14 @@
                               Label="NIF"
                               Placeholder="Número de Identificação Fiscal"
                               Variant="Variant.Outlined"
-                              FullWidth="true"
+                              
                               MaxLength="40" />
                 break;
             case TipoDocumentoEnum.SemNIF:
                 <MudSelect @bind-Value="Model.CNaoNIF"
                            Label="Motivo para não informar NIF"
                            Variant="Variant.Outlined"
-                           FullWidth="true">
+                           >
                     <MudSelectItem Value="MotivoNaoNIF.DispensadoNIF">Dispensado do NIF</MudSelectItem>
                     <MudSelectItem Value="MotivoNaoNIF.NaoExigenciaNIF">Não exigência do NIF</MudSelectItem>
                 </MudSelect>
@@ -76,7 +76,7 @@
                           Label="CAEPF"
                           Placeholder="Cadastro de Atividade Econômica da Pessoa Física"
                           Variant="Variant.Outlined"
-                          FullWidth="true"
+                          
                           Validation="@(new Func<string, string?>(ValidateCAEPF))" />
         </MudItem>
     }
@@ -87,7 +87,7 @@
                       Label="Inscrição Municipal"
                       Placeholder="Número da inscrição municipal"
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       MaxLength="15" />
     </MudItem>
 
@@ -97,7 +97,7 @@
                       Label="@(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Razão Social" : "Nome Completo")"
                       Placeholder="@(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Nome empresarial" : "Nome da pessoa física")"
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       Required="@IsRequired"
                       MaxLength="300"
                       Validation="@(new Func<string, string?>(ValidateName))" />
@@ -109,7 +109,7 @@
                       Label="Telefone"
                       Placeholder="(11) 99999-9999"
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       Validation="@(new Func<string, string?>(ValidatePhone))" />
     </MudItem>
     <MudItem xs="12" md="6">
@@ -117,7 +117,7 @@
                       Label="E-mail"
                       Placeholder="contato@empresa.com.br"
                       Variant="Variant.Outlined"
-                      FullWidth="true"
+                      
                       InputType="InputType.Email"
                       Validation="@(new Func<string, string?>(ValidateEmail))" />
     </MudItem>

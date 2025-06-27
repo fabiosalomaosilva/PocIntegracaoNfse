@@ -15,7 +15,7 @@
                                       Label="Código Município Prestação (IBGE)"
                                       Placeholder="7 dígitos do código IBGE"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       MaxLength="7"
                                       Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))" />
                     </MudItem>
@@ -24,7 +24,7 @@
                                       Label="Código País Prestação (ISO)"
                                       Placeholder="2 letras do código ISO"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       MaxLength="2"
                                       Validation="@(new Func<string, string?>(ValidateCodigoPais))" />
                     </MudItem>
@@ -48,7 +48,7 @@
                                       Label="Código Tributação Nacional *"
                                       Placeholder="6 dígitos (ex: 140101)"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       Required="true"
                                       MaxLength="6"
                                       Validation="@(new Func<string, string?>(ValidateCodigoTributacaoNacional))"
@@ -59,7 +59,7 @@
                                       Label="Código Tributação Municipal"
                                       Placeholder="3 dígitos"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       MaxLength="3"
                                       Validation="@(new Func<string, string?>(ValidateCodigoTributacaoMunicipal))"
                                       HelperText="Código específico do município (opcional)" />
@@ -69,7 +69,7 @@
                                       Label="Descrição do Serviço *"
                                       Placeholder="Descrição detalhada do serviço prestado"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       Required="true"
                                       Lines="3"
                                       MaxLength="2000"
@@ -81,7 +81,7 @@
                                       Label="Código NBS"
                                       Placeholder="9 dígitos"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       MaxLength="9"
                                       Validation="@(new Func<string, string?>(ValidateCodigoNBS))"
                                       HelperText="Nomenclatura Brasileira de Serviços" />
@@ -91,7 +91,7 @@
                                       Label="Código Interno"
                                       Placeholder="Código interno do contribuinte"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       MaxLength="20"
                                       HelperText="Código de controle interno (opcional)" />
                     </MudItem>
@@ -110,7 +110,7 @@
                                       Label="ID Documento Técnico"
                                       Placeholder="ART, RRT, DRT, etc."
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       MaxLength="40"
                                       HelperText="Identificador de responsabilidade técnica" />
                     </MudItem>
@@ -119,7 +119,7 @@
                                       Label="Documento de Referência"
                                       Placeholder="Número do contrato, nota, etc."
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       MaxLength="255"
                                       HelperText="Documento que originou este serviço" />
                     </MudItem>
@@ -128,7 +128,7 @@
                                       Label="Informações Complementares"
                                       Placeholder="Observações gerais sobre o serviço"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       Lines="3"
                                       MaxLength="2000"
                                       HelperText="Informações adicionais (opcional)" />

@@ -87,7 +87,7 @@
                                     <MudText Typo="Typo.body2">@SelectedDocumentType</MudText>
                                 </MudStack>
                             }
-                            
+
                             @if (ValidationResult != null)
                             {
                                 <MudStack AlignItems="AlignItems.Center" Spacing="1">
@@ -96,7 +96,7 @@
                                     <MudText Typo="Typo.caption">Status</MudText>
                                     <MudText Typo="Typo.body2">@(ValidationResult.IsValid ? "Válido" : "Inválido")</MudText>
                                 </MudStack>
-                                
+
                                 @if (ValidationResult.Errors.Any())
                                 {
                                     <MudStack AlignItems="AlignItems.Center" Spacing="1">
@@ -105,7 +105,7 @@
                                         <MudText Typo="Typo.body2">@ValidationResult.Errors.Count</MudText>
                                     </MudStack>
                                 }
-                                
+
                                 @if (ValidationResult.Warnings.Any())
                                 {
                                     <MudStack AlignItems="AlignItems.Center" Spacing="1">
@@ -141,7 +141,7 @@
                                 </MudRadio>
                             </MudRadioGroup>
                         </MudStack>
-                        
+
                         <!-- Ações de Importação -->
                         <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
                             <MudButton StartIcon="@Icons.Material.Filled.Upload"
@@ -160,15 +160,15 @@
             </MudCard>
 
             <!-- Conteúdo Principal -->
-            <MudTabs Elevation="4" 
-                     Rounded="true" 
+            <MudTabs Elevation="4"
+                     Rounded="true"
                      PanelClass="mud-height-full"
                      Color="Color.Primary"
                      SliderColor="Color.Primary"
                      ActivePanelIndex="GetActiveTabIndex()">
-                
+
                 <!-- Tab DPS -->
-                <MudTabPanel Text="DPS" 
+                <MudTabPanel Text="DPS"
                              Icon="@Icons.Material.Filled.Assignment"
                              ToolTip="Declaração de Prestação de Serviços"
                              BadgeData="@(SelectedDocumentType == "DPS" ? "●" : null)"
@@ -196,7 +196,7 @@
                 </MudTabPanel>
 
                 <!-- Tab NFSe -->
-                <MudTabPanel Text="NFSe" 
+                <MudTabPanel Text="NFSe"
                              Icon="@Icons.Material.Filled.Receipt"
                              ToolTip="Nota Fiscal de Serviços Eletrônica"
                              BadgeData="@(SelectedDocumentType == "NFSe" ? "●" : null)"
@@ -260,7 +260,6 @@
                                                       Label="XML Gerado"
                                                       Variant="Variant.Outlined"
                                                       Lines="20"
-                                                      FullWidth="true"
                                                       ReadOnly="true"
                                                       Class="xml-display" />
                                     </MudCardContent>
@@ -281,7 +280,7 @@
                     <div class="pa-4">
                         <MudStack Spacing="3">
                             <MudText Typo="Typo.h6">Resultado da Validação</MudText>
-                            
+
                             @if (ValidationResult != null)
                             {
                                 <MudAlert Severity="@(ValidationResult.IsValid ? Severity.Success : Severity.Error)"
@@ -297,7 +296,7 @@
                                 @if (ValidationResult.Errors.Any())
                                 {
                                     <MudExpansionPanels Elevation="2" Rounded="true">
-                                        <MudExpansionPanel Text="@($"Erros ({ValidationResult.Errors.Count})")" 
+                                        <MudExpansionPanel Text="@($"Erros ({ValidationResult.Errors.Count})")"
                                                            Icon="@Icons.Material.Filled.Error"
                                                            IsExpanded="true">
                                             <MudList T="string">
@@ -316,7 +315,7 @@
                                 @if (ValidationResult.Warnings.Any())
                                 {
                                     <MudExpansionPanels Elevation="2" Rounded="true">
-                                        <MudExpansionPanel Text="@($"Avisos ({ValidationResult.Warnings.Count})")" 
+                                        <MudExpansionPanel Text="@($"Avisos ({ValidationResult.Warnings.Count})")"
                                                            Icon="@Icons.Material.Filled.Warning">
                                             <MudList T="string">
                                                 @foreach (var warning in ValidationResult.Warnings)
@@ -394,7 +393,7 @@
         {
             // Gerar XML automaticamente ao salvar
             await GenerateXml();
-            
+
             // Aqui você pode adicionar lógica para salvar em banco de dados, arquivo, etc.
             Snackbar.Add("DPS salvo com sucesso!", Severity.Success);
         }
@@ -420,11 +419,11 @@
 
             // Depois validar
             ValidationResult = await XmlValidator.ValidateAsync(xml);
-            
-            var message = ValidationResult.IsValid 
-                ? "DPS validado com sucesso!" 
+
+            var message = ValidationResult.IsValid
+                ? "DPS validado com sucesso!"
                 : $"Validação falhou: {ValidationResult.Errors.Count} erro(s) encontrado(s)";
-            
+
             var severity = ValidationResult.IsValid ? Severity.Success : Severity.Error;
             Snackbar.Add(message, severity);
         }
@@ -449,7 +448,7 @@
 
     #endregion
 
-    #region XML Actions    
+    #region XML Actions
 
     private async Task GenerateXml()
     {
@@ -508,7 +507,7 @@
         }
     }
 
-    
+
 
     #region NFSe Event Handlers
 
@@ -546,8 +545,8 @@
             // Depois validar
             ValidationResult = await XmlValidator.ValidateAsync(xml);
 
-            var message = ValidationResult.IsValid 
-                ? "NFSe validado com sucesso!" 
+            var message = ValidationResult.IsValid
+                ? "NFSe validado com sucesso!"
                 : $"Validação falhou: {ValidationResult.Errors.Count} erro(s) encontrado(s)";
 
             var severity = ValidationResult.IsValid ? Severity.Success : Severity.Error;
@@ -619,7 +618,7 @@
 
     #region XML Actions
 
- 
+
 
     private async Task DownloadXml()
     {
@@ -716,66 +715,66 @@
     private void LoadSampleDps()
     {
         DpsModel = new DpsModel
-        {
-            InfDPS = new InfDpsModel
             {
-                Id = $"DPS{DateTime.Now:yyyyMMddHHmmss}",
-                TpAmb = Models.Enums.TipoAmbiente.Homologacao,
-                DhEmi = DateTime.Now,
-                VerAplic = "1.00",
-                Serie = "00001",
-                NDPS = "123",
-                DCompet = DateOnly.FromDateTime(DateTime.Now),
-                TpEmit = Models.Enums.EmitenteDPS.Prestador,
-                CLocEmi = "3542404"
-            }
-        };
+                InfDPS = new InfDpsModel
+                {
+                    Id = $"DPS{DateTime.Now:yyyyMMddHHmmss}",
+                    TpAmb = Models.Enums.TipoAmbiente.Homologacao,
+                    DhEmi = DateTime.Now,
+                    VerAplic = "1.00",
+                    Serie = "00001",
+                    NDPS = "123",
+                    DCompet = DateOnly.FromDateTime(DateTime.Now),
+                    TpEmit = Models.Enums.EmitenteDPS.Prestador,
+                    CLocEmi = "3542404"
+                }
+            };
     }
 
     private void LoadSampleNfse()
     {
         NfseModel = new NfseModel
-        {
-            InfNFSe = new InfNfseModel
             {
-                Id = $"NFS{DateTime.Now:yyyyMMddHHmmss}",
-                XLocEmi = "Regente Feijó",
-                XLocPrestacao = "Regente Feijó",
-                NNFSe = "1",
-                VerAplic = "1.00",
-                AmbGer = Models.Enums.AmbienteGeradorNFSe.SistemaNacional,
-                TpEmis = Models.Enums.TipoEmissao.EmissaoNormalNacional,
-                ProcEmi = ProcessoEmissao.AplicativoContribuinte,
-                CStat = 100,
-                DhProc = DateTime.Now,
-                NDFSe = "1",
-                Emit = new EmitenteNfseModel
+                InfNFSe = new InfNfseModel
                 {
-                    CNPJ = "12345678000190",
-                    IM = "4292",
-                    XNome = "Empresa de Teste 01",
-                    XFant = "Empresa Teste",
-                    EnderNac = new EnderecoEmitenteModel
+                    Id = $"NFS{DateTime.Now:yyyyMMddHHmmss}",
+                    XLocEmi = "Regente Feijó",
+                    XLocPrestacao = "Regente Feijó",
+                    NNFSe = "1",
+                    VerAplic = "1.00",
+                    AmbGer = Models.Enums.AmbienteGeradorNFSe.SistemaNacional,
+                    TpEmis = Models.Enums.TipoEmissao.EmissaoNormalNacional,
+                    ProcEmi = ProcessoEmissao.AplicativoContribuinte,
+                    CStat = 100,
+                    DhProc = DateTime.Now,
+                    NDFSe = "1",
+                    Emit = new EmitenteNfseModel
                     {
-                        XLgr = "AV. ATILIO ALBERTINI",
-                        Nro = "123",
-                        XBairro = "DISTRITO INDUSTRIAL",
-                        CMun = "3542404",
-                        UF = Models.Enums.UnidadeFederacao.SP,
-                        CEP = "19570000"
+                        CNPJ = "12345678000190",
+                        IM = "4292",
+                        XNome = "Empresa de Teste 01",
+                        XFant = "Empresa Teste",
+                        EnderNac = new EnderecoEmitenteModel
+                        {
+                            XLgr = "AV. ATILIO ALBERTINI",
+                            Nro = "123",
+                            XBairro = "DISTRITO INDUSTRIAL",
+                            CMun = "3542404",
+                            UF = Models.Enums.UnidadeFederacao.SP,
+                            CEP = "19570000"
+                        },
+                        Fone = "1832296800",
+                        Email = "teste@teste.com.br"
                     },
-                    Fone = "1832296800",
-                    Email = "teste@teste.com.br"
-                },
-                Valores = new ValoresNfseModel
-                {
-                    VLiq = 1623.03m,
-                    VBC = 1623.03m,
-                    PAliqAplic = 3.00m,
-                    VISSQN = 48.69m
+                    Valores = new ValoresNfseModel
+                    {
+                        VLiq = 1623.03m,
+                        VBC = 1623.03m,
+                        PAliqAplic = 3.00m,
+                        VISSQN = 48.69m
+                    }
                 }
-            }
-        };
+            };
     }
 
     #endregion

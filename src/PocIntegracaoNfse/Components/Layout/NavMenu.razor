@@ -1,80 +1,214 @@
 ﻿<MudNavMenu>
     <MudText Typo="Typo.h6" Class="px-4 py-2">Menu Principal</MudText>
 
+    <!-- Dashboard Principal -->
     <MudNavLink Href="/" Match="NavLinkMatch.All">
         <MudIcon Icon="Icons.Material.Filled.Home" Class="mr-3" />
         Dashboard
     </MudNavLink>
 
-    <MudNavGroup Text="NFSe" Icon="Icons.Material.Filled.Description" Expanded="true">
+    <MudDivider Class="my-2" />
+
+    <!-- Seção XML Editor/Viewer -->
+    <MudNavGroup Text="Editor XML" Icon="Icons.Material.Filled.Edit" Expanded="true">
         <MudNavLink Href="/xml-editor">
             <MudIcon Icon="Icons.Material.Filled.Edit" Class="mr-3" />
-            Editor XML
+            Editor Principal
         </MudNavLink>
 
         <MudNavLink Href="/xml-viewer">
             <MudIcon Icon="Icons.Material.Filled.Visibility" Class="mr-3" />
             Visualizar XML
         </MudNavLink>
-
-        <MudNavLink Href="/xml-validator">
-            <MudIcon Icon="Icons.Material.Filled.CheckCircle" Class="mr-3" />
-            Validar XML
-        </MudNavLink>
     </MudNavGroup>
 
+    <!-- Seção DPS - Funcionalidades Implementadas -->
     <MudNavGroup Text="DPS" Icon="Icons.Material.Filled.Assignment" Expanded="true">
-        <MudNavLink Href="/dps/novo">
+        <MudNavLink Href="/xml-editor">
             <MudIcon Icon="Icons.Material.Filled.Add" Class="mr-3" />
             Nova DPS
         </MudNavLink>
 
-        <MudNavLink Href="/dps/lista">
+        <!-- Futuras implementações -->
+        <MudNavLink Href="/dps/lista" Disabled="true">
             <MudIcon Icon="Icons.Material.Filled.List" Class="mr-3" />
             Listar DPS
+            <MudChip Size="Size.Small" Color="Color.Warning" Variant="Variant.Text" Class="ml-2" T="string">
+                Em breve
+            </MudChip>
         </MudNavLink>
 
-        <MudNavLink Href="/dps/importar">
+        <MudNavLink Href="/dps/importar" Disabled="true">
             <MudIcon Icon="Icons.Material.Filled.Upload" Class="mr-3" />
             Importar DPS
+            <MudChip Size="Size.Small" Color="Color.Warning" Variant="Variant.Text" Class="ml-2" T="string">
+                Em breve
+            </MudChip>
+        </MudNavLink>
+    </MudNavGroup>
+
+    <!-- Seção NFSe - Funcionalidades Implementadas -->
+    <MudNavGroup Text="NFSe" Icon="Icons.Material.Filled.Description" Expanded="false">
+        <MudNavLink Href="/xml-editor">
+            <MudIcon Icon="Icons.Material.Filled.Add" Class="mr-3" />
+            Nova NFSe
+        </MudNavLink>
+
+        <!-- Futuras implementações -->
+        <MudNavLink Href="/nfse/lista" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.List" Class="mr-3" />
+            Listar NFSe
+            <MudChip Size="Size.Small" Color="Color.Warning" Variant="Variant.Text" Class="ml-2" T="string">
+                Em breve
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/nfse/consulta" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.Search" Class="mr-3" />
+            Consultar NFSe
+            <MudChip Size="Size.Small" Color="Color.Warning" Variant="Variant.Text" Class="ml-2" T="string">
+                Em breve
+            </MudChip>
         </MudNavLink>
     </MudNavGroup>
 
     <MudDivider Class="my-2" />
 
-    <MudNavGroup Text="Certificados" Icon="Icons.Material.Filled.Security">
-        <MudNavLink Href="/certificados">
+    <!-- Seção Validação -->
+    <MudNavGroup Text="Validação" Icon="Icons.Material.Filled.CheckCircle" Expanded="false">
+        <MudNavLink Href="/xml-editor">
+            <MudIcon Icon="Icons.Material.Filled.CheckCircle" Class="mr-3" />
+            Validar XML
+        </MudNavLink>
+
+        <!-- Futuras implementações -->
+        <MudNavLink Href="/validacao/batch" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.BatchPrediction" Class="mr-3" />
+            Validação em Lote
+            <MudChip Size="Size.Small" Color="Color.Warning" Variant="Variant.Text" Class="ml-2" T="string">
+                Em breve
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/validacao/historico" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.History" Class="mr-3" />
+            Histórico
+            <MudChip Size="Size.Small" Color="Color.Warning" Variant="Variant.Text" Class="ml-2" T="string">
+                Em breve
+            </MudChip>
+        </MudNavLink>
+    </MudNavGroup>
+
+    <!-- Seção Certificados Digitais -->
+    <MudNavGroup Text="Certificados" Icon="Icons.Material.Filled.Security" Expanded="false">
+        <!-- Futuras implementações -->
+        <MudNavLink Href="/certificados" Disabled="true">
             <MudIcon Icon="Icons.Material.Filled.Certificate" Class="mr-3" />
             Gerenciar
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
         </MudNavLink>
 
-        <MudNavLink Href="/certificados/instalar">
+        <MudNavLink Href="/certificados/instalar" Disabled="true">
             <MudIcon Icon="Icons.Material.Filled.InstallDesktop" Class="mr-3" />
             Instalar
-        </MudNavLink>
-    </MudNavGroup>
-
-    <MudNavGroup Text="Administração" Icon="Icons.Material.Filled.AdminPanelSettings">
-        <MudNavLink Href="/admin/dashboard">
-            <MudIcon Icon="Icons.Material.Filled.Dashboard" Class="mr-3" />
-            Dashboard
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
         </MudNavLink>
 
-        <MudNavLink Href="/admin/logs">
-            <MudIcon Icon="Icons.Material.Filled.Article" Class="mr-3" />
-            Logs
-        </MudNavLink>
-
-        <MudNavLink Href="/admin/configuracoes">
-            <MudIcon Icon="Icons.Material.Filled.Settings" Class="mr-3" />
-            Configurações
+        <MudNavLink Href="/certificados/validar" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.VerifiedUser" Class="mr-3" />
+            Validar
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
         </MudNavLink>
     </MudNavGroup>
 
     <MudDivider Class="my-2" />
 
-    <MudNavLink Href="/sobre">
-        <MudIcon Icon="Icons.Material.Filled.Info" Class="mr-3" />
-        Sobre
+    <!-- Seção Administração -->
+    <MudNavGroup Text="Administração" Icon="Icons.Material.Filled.AdminPanelSettings" Expanded="false">
+        <!-- Futuras implementações -->
+        <MudNavLink Href="/admin/dashboard" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.Dashboard" Class="mr-3" />
+            Dashboard Admin
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/admin/logs" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.Article" Class="mr-3" />
+            Logs do Sistema
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/admin/configuracoes" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.Settings" Class="mr-3" />
+            Configurações
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/admin/usuarios" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.People" Class="mr-3" />
+            Usuários
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+    </MudNavGroup>
+
+    <MudDivider Class="my-2" />
+
+    <!-- Links de Ajuda e Informações -->
+    <MudNavGroup Text="Ajuda & Info" Icon="Icons.Material.Filled.Help" Expanded="false">
+        <!-- Futuras implementações -->
+        <MudNavLink Href="/docs/schemas" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.MenuBook" Class="mr-3" />
+            Documentação
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/docs/api" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.Api" Class="mr-3" />
+            API
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/sobre" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.Info" Class="mr-3" />
+            Sobre o Sistema
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+
+        <MudNavLink Href="/suporte" Disabled="true">
+            <MudIcon Icon="Icons.Material.Filled.Support" Class="mr-3" />
+            Suporte
+            <MudChip Size="Size.Small" Color="Color.Info" Variant="Variant.Text" Class="ml-2" T="string">
+                Futuro
+            </MudChip>
+        </MudNavLink>
+    </MudNavGroup>
+
+    <!-- Link de Desenvolvimento (removível em produção) -->
+    <MudDivider Class="my-2" />
+    <MudText Typo="Typo.caption" Class="px-4 py-1 text-secondary">Desenvolvimento</MudText>
+    
+    <MudNavLink Href="/counter">
+        <MudIcon Icon="Icons.Material.Filled.BugReport" Class="mr-3" />
+        Counter (Teste)
     </MudNavLink>
 </MudNavMenu>

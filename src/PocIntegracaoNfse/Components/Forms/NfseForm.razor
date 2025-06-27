@@ -27,7 +27,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Id"
                                   Label="ID da NFSe"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="53"
                                   ReadOnly="true"
@@ -39,7 +39,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.NNFSe"
                                   Label="Número da NFSe"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="13"
                                   ReadOnly="true"
@@ -51,7 +51,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.XLocEmi"
                                   Label="Município Emissor"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="150"
                                   Validation="@(new Func<string, string?>(ValidateLocalizacao))" />
@@ -62,7 +62,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.XLocPrestacao"
                                   Label="Local da Prestação"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="150"
                                   Validation="@(new Func<string, string?>(ValidateLocalizacao))" />
@@ -73,7 +73,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.CLocIncid"
                                   Label="Código Município Incidência (IBGE)"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="7"
                                   Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))"
                                   HelperText="Código IBGE do município de incidência do ISSQN" />
@@ -84,7 +84,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.XLocIncid"
                                   Label="Descrição Município Incidência"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="150"
                                   HelperText="Nome do município de incidência" />
                 </MudItem>
@@ -94,7 +94,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.VerAplic"
                                   Label="Versão do Aplicativo"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="20"
                                   ReadOnly="true" />
@@ -105,7 +105,7 @@
                     <MudSelect @bind-Value="Model.InfNFSe.AmbGer"
                                Label="Ambiente Gerador"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true"
                                ReadOnly="true">
                         <MudSelectItem Value="AmbienteGeradorNFSe.Prefeitura">Prefeitura</MudSelectItem>
@@ -118,7 +118,7 @@
                     <MudSelect @bind-Value="Model.InfNFSe.TpEmis"
                                Label="Tipo de Emissão"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true">
                         <MudSelectItem Value="TipoEmissao.EmissaoNormalNacional">Emissão Normal Nacional</MudSelectItem>
                         <MudSelectItem Value="TipoEmissao.EmissaoOriginalMunicipal">Emissão Original Municipal</MudSelectItem>
@@ -130,7 +130,7 @@
                     <MudSelect @bind-Value="Model.InfNFSe.ProcEmi"
                                Label="Processo de Emissão"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true">
                         <MudSelectItem Value="ProcessoEmissao.AplicativoContribuinte">Aplicativo do Contribuinte (Web Service)</MudSelectItem>
                         <MudSelectItem Value="ProcessoEmissao.AplicativoFiscoWeb">Aplicativo do Fisco (Web)</MudSelectItem>
@@ -143,7 +143,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.CStat"
                                   Label="Código do Status"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   ReadOnly="true"
                                   HelperText="Status do processamento da NFSe" />
@@ -154,7 +154,7 @@
                     <MudDatePicker @bind-Date="DataProcessamento"
                                    Label="Data de Processamento"
                                    Variant="Variant.Outlined"
-                                   FullWidth="true"
+                                   
                                    Required="true"
                                    ReadOnly="true"
                                    DateFormat="dd/MM/yyyy" />
@@ -165,7 +165,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.NDFSe"
                                   Label="Número DFSe"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="13"
                                   ReadOnly="true"
@@ -196,7 +196,7 @@
                         <MudTextField @bind-Value="Model.InfNFSe.Emit.CNPJ"
                                       Label="CNPJ"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       Required="true"
                                       MaxLength="14"
                                       Validation="@(new Func<string, string?>(ValidateCNPJ))"
@@ -207,7 +207,7 @@
                         <MudTextField @bind-Value="Model.InfNFSe.Emit.CPF"
                                       Label="CPF"
                                       Variant="Variant.Outlined"
-                                      FullWidth="true"
+                                      
                                       Required="true"
                                       MaxLength="11"
                                       Validation="@(new Func<string, string?>(ValidateCPF))"
@@ -220,7 +220,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.IM"
                                   Label="Inscrição Municipal"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="15" />
                 </MudItem>
 
@@ -229,7 +229,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.XNome"
                                   Label="@(TipoDocumentoEmitente == "CNPJ" ? "Razão Social" : "Nome Completo")"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="300"
                                   Validation="@(new Func<string, string?>(ValidateNome))" />
@@ -240,7 +240,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.XFant"
                                   Label="Nome Fantasia"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="60" />
                 </MudItem>
 
@@ -249,7 +249,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.Fone"
                                   Label="Telefone"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="20"
                                   Validation="@(new Func<string, string?>(ValidateTelefone))"
                                   Mask="@(new PatternMask("(00) 00000-0000"))" />
@@ -260,7 +260,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.Email"
                                   Label="E-mail"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="60"
                                   InputType="InputType.Email"
                                   Validation="@(new Func<string, string?>(ValidateEmail))" />
@@ -276,7 +276,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.XLgr"
                                   Label="Logradouro"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="200" />
                 </MudItem>
@@ -285,7 +285,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.Nro"
                                   Label="Número"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="10" />
                 </MudItem>
@@ -294,7 +294,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.XCpl"
                                   Label="Complemento"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="60" />
                 </MudItem>
 
@@ -302,7 +302,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.XBairro"
                                   Label="Bairro"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="60" />
                 </MudItem>
@@ -311,7 +311,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.CMun"
                                   Label="Código Município (IBGE)"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="7"
                                   Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))" />
@@ -321,7 +321,7 @@
                     <MudSelect @bind-Value="Model.InfNFSe.Emit.EnderNac.UF"
                                Label="UF"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true">
                         @foreach (var uf in Enum.GetValues<UnidadeFederacao>())
                         {
@@ -334,7 +334,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.CEP"
                                   Label="CEP"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="8"
                                   Validation="@(new Func<string, string?>(ValidateCEP))"
@@ -355,7 +355,7 @@
                     <MudNumericField @bind-Value="Model.InfNFSe.Valores.VCalcDR"
                                      Label="Valor Cálculo Dedução/Redução"
                                      Variant="Variant.Outlined"
-                                     FullWidth="true"
+                                     
                                      Format="C2"
                                      Culture="CultureInfo.InvariantCulture"
                                      Min="0"
@@ -367,7 +367,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Valores.TpBM"
                                   Label="Tipo de Benefício Municipal"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   MaxLength="40" />
                 </MudItem>
 
@@ -376,7 +376,7 @@
                     <MudNumericField @bind-Value="Model.InfNFSe.Valores.VCalcBM"
                                      Label="Valor Cálculo Benefício Municipal"
                                      Variant="Variant.Outlined"
-                                     FullWidth="true"
+                                     
                                      Format="C2"
                                      Culture="CultureInfo.InvariantCulture"
                                      Min="0"
@@ -388,7 +388,7 @@
                     <MudNumericField @bind-Value="Model.InfNFSe.Valores.VBC"
                                      Label="Base de Cálculo do ISSQN"
                                      Variant="Variant.Outlined"
-                                     FullWidth="true"
+                                     
                                      Format="C2"
                                      Culture="CultureInfo.InvariantCulture"
                                      Min="0"
@@ -400,7 +400,7 @@
                     <MudNumericField @bind-Value="Model.InfNFSe.Valores.PAliqAplic"
                                      Label="Alíquota Aplicada (%)"
                                      Variant="Variant.Outlined"
-                                     FullWidth="true"
+                                     
                                      Format="N2"
                                      Min="0"
                                      Max="100"
@@ -412,7 +412,7 @@
                     <MudNumericField @bind-Value="Model.InfNFSe.Valores.VISSQN"
                                      Label="Valor do ISSQN"
                                      Variant="Variant.Outlined"
-                                     FullWidth="true"
+                                     
                                      Format="C2"
                                      Culture="CultureInfo.InvariantCulture"
                                      Min="0"
@@ -424,7 +424,7 @@
                     <MudNumericField @bind-Value="Model.InfNFSe.Valores.VTotalRet"
                                      Label="Valor Total Retenções"
                                      Variant="Variant.Outlined"
-                                     FullWidth="true"
+                                     
                                      Format="C2"
                                      Culture="CultureInfo.InvariantCulture"
                                      Min="0"
@@ -436,7 +436,7 @@
                     <MudNumericField @bind-Value="Model.InfNFSe.Valores.VLiq"
                                      Label="Valor Líquido"
                                      Variant="Variant.Outlined"
-                                     FullWidth="true"
+                                     
                                      Format="C2"
                                      Culture="CultureInfo.InvariantCulture"
                                      Min="0"
@@ -450,7 +450,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.Valores.XOutInf"
                                   Label="Informações Adicionais"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Lines="3"
                                   MaxLength="2000"
                                   HelperText="Uso da Administração Tributária Municipal" />
@@ -470,7 +470,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.XTribNac"
                                   Label="Descrição da Tributação Nacional"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Lines="3"
                                   MaxLength="600"
                                   ReadOnly="true"
@@ -482,7 +482,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.XTribMun"
                                   Label="Descrição da Tributação Municipal"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Lines="3"
                                   MaxLength="600"
                                   ReadOnly="true"
@@ -494,7 +494,7 @@
                     <MudTextField @bind-Value="Model.InfNFSe.XNBS"
                                   Label="Descrição do Código NBS"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Lines="2"
                                   MaxLength="600"
                                   ReadOnly="true"

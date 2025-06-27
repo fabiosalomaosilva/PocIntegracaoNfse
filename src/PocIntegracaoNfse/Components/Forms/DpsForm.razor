@@ -23,7 +23,7 @@
                     <MudSelect @bind-Value="Model.InfDPS.TpAmb"
                                Label="Ambiente"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true">
                         <MudSelectItem Value="TipoAmbiente.Homologacao">Homologação</MudSelectItem>
                         <MudSelectItem Value="TipoAmbiente.Producao">Produção</MudSelectItem>
@@ -34,7 +34,7 @@
                     <MudTextField @bind-Value="Model.InfDPS.Serie"
                                   Label="Série"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="5"
                                   Validation="@(new Func<string, string?>(ValidateSerie))" />
@@ -44,7 +44,7 @@
                     <MudTextField @bind-Value="Model.InfDPS.NDPS"
                                   Label="Número DPS"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="15"
                                   Validation="@(new Func<string, string?>(ValidateNumero))" />
@@ -54,7 +54,7 @@
                     <MudTextField @bind-Value="Model.InfDPS.VerAplic"
                                   Label="Versão Aplicativo"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="20" />
                 </MudItem>
@@ -63,7 +63,7 @@
                     <MudDatePicker @bind-Date="DataEmissao"
                                    Label="Data de Emissão"
                                    Variant="Variant.Outlined"
-                                   FullWidth="true"
+                                   
                                    Required="true"
                                    DateFormat="dd/MM/yyyy" />
                 </MudItem>
@@ -72,7 +72,7 @@
                     <MudDatePicker @bind-Date="DataCompetencia"
                                    Label="Data de Competência"
                                    Variant="Variant.Outlined"
-                                   FullWidth="true"
+                                   
                                    Required="true"
                                    DateFormat="dd/MM/yyyy" />
                 </MudItem>
@@ -81,7 +81,7 @@
                     <MudSelect @bind-Value="Model.InfDPS.TpEmit"
                                Label="Emitente da DPS"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true">
                         <MudSelectItem Value="EmitenteDPS.Prestador">Prestador</MudSelectItem>
                         <MudSelectItem Value="EmitenteDPS.Tomador">Tomador</MudSelectItem>
@@ -93,7 +93,7 @@
                     <MudTextField @bind-Value="Model.InfDPS.CLocEmi"
                                   Label="Código Município Emissor (IBGE)"
                                   Variant="Variant.Outlined"
-                                  FullWidth="true"
+                                  
                                   Required="true"
                                   MaxLength="7"
                                   Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))" />
@@ -122,7 +122,7 @@
                     <MudSelect @bind-Value="Model.InfDPS.Prest.RegTrib.OpSimpNac"
                                Label="Situação - Simples Nacional"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true">
                         <MudSelectItem Value="SituacaoSimplesNacional.NaoOptante">Não Optante</MudSelectItem>
                         <MudSelectItem Value="SituacaoSimplesNacional.OptanteMEI">Optante - MEI</MudSelectItem>
@@ -135,7 +135,7 @@
                         <MudSelect @bind-Value="Model.InfDPS.Prest.RegTrib.RegApTribSN"
                                    Label="Regime de Apuração SN"
                                    Variant="Variant.Outlined"
-                                   FullWidth="true">
+                                   >
                             <MudSelectItem Value="RegimeApuracaoSimplesNacional.TributosFederaisEMunicipalSN">
                                 Federal e Municipal pelo SN
                             </MudSelectItem>
@@ -152,7 +152,7 @@
                     <MudSelect @bind-Value="Model.InfDPS.Prest.RegTrib.RegEspTrib"
                                Label="Regime Especial de Tributação"
                                Variant="Variant.Outlined"
-                               FullWidth="true"
+                               
                                Required="true">
                         <MudSelectItem Value="RegimeEspecialTributacao.Nenhum">Nenhum</MudSelectItem>
                         <MudSelectItem Value="RegimeEspecialTributacao.AtoCooperado">Ato Cooperado</MudSelectItem>
