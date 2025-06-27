@@ -1,0 +1,159 @@
+﻿@using PocIntegracaoNfse.Core.Models.Validation
+
+<MudCard Class="@CssClass" Style="@Style">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <MudCardHeader>
+            <CardHeaderContent>
+                <div class="d-flex align-center">
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <MudIcon Icon="@Icon" Class="mr-3" Color="@IconColor" />
+                    }
+                    <div>
+                        <MudText Typo="Typo.h6">@Title</MudText>
+                        @if (!string.IsNullOrEmpty(Subtitle))
+                        {
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@Subtitle</MudText>
+                        }
+                    </div>
+                </div>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                @if (ShowValidationStatus && ValidationResult != null)
+                {
+                    @if (ValidationResult.IsValid)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                    }
+                    else if (ValidationResult.Errors.Any())
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" />
+                    }
+                    else if (ValidationResult.Warnings.Any())
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" />
+                    }
+                }
+                @HeaderActions
+            </CardHeaderActions>
+        </MudCardHeader>
+    }
+
+    <MudCardContent>
+        @if (ValidationResult != null && ShowValidationSummary)
+        {
+            <ValidationSummary Result="ValidationResult" Class="mb-4" />
+        }
+
+        @if (IsLoading)
+        {
+            <div class="d-flex justify-center pa-4">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else
+        {
+            @ChildContent
+        }
+    </MudCardContent>
+
+    @if (ShowActions)
+    {
+        <MudCardActions>
+            <div class="d-flex justify-end gap-2 pa-2">
+                @if (ShowClearButton)
+                {
+                    <MudButton Variant="Variant.Text"
+                               OnClick="OnClear"
+                               StartIcon="@Icons.Material.Filled.Clear">
+                        Limpar
+                    </MudButton>
+                }
+                @if (ShowValidateButton)
+                {
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Info"
+                               OnClick="OnValidate"
+                               StartIcon="@Icons.Material.Filled.CheckCircle"
+                               Disabled="IsLoading">
+                        Validar
+                    </MudButton>
+                }
+                @if (ShowSaveButton)
+                {
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="OnSave"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               Disabled="IsLoading">
+                        Salvar
+                    </MudButton>
+                }
+                @Actions
+            </div>
+        </MudCardActions>
+    }
+</MudCard>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Icon { get; set; } = string.Empty;
+
+    [Parameter]
+    public Color IconColor { get; set; } = Color.Primary;
+
+    [Parameter]
+    public string CssClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Style { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public bool ShowActions { get; set; } = true;
+
+    [Parameter]
+    public bool ShowSaveButton { get; set; } = true;
+
+    [Parameter]
+    public bool ShowValidateButton { get; set; } = true;
+
+    [Parameter]
+    public bool ShowClearButton { get; set; } = true;
+
+    [Parameter]
+    public bool ShowValidationStatus { get; set; } = true;
+
+    [Parameter]
+    public bool ShowValidationSummary { get; set; } = true;
+
+    [Parameter]
+    public ValidationResult? ValidationResult { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidate { get; set; }
+
+    [Parameter]
+    public EventCallback OnClear { get; set; }
+}

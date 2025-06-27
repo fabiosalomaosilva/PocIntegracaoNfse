@@ -1,0 +1,438 @@
+﻿@using PocIntegracaoNfse.Models.Enums
+@using System.Globalization
+@using PocIntegracaoNfse.Models.DPS
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h6" Class="mb-4">Valores e Tributação</MudText>
+    </MudItem>
+
+    <!-- Valores do Serviço -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Valores do Serviço" Icon="@Icons.Material.Filled.AttachMoney" IsInitiallyExpanded="true">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudNumericField @bind-Value="Model.VServPrest.VServ"
+                                         Label="Valor do Serviço *"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Required="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0.01m"
+                                         Validation="@(new Func<decimal, string?>(ValidateValorServico))"
+                                         HelperText="Valor total do serviço prestado" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudNumericField @bind-Value="ValorRecebidoIntermediario"
+                                         Label="Valor Recebido Intermediário"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Valor para intermediário (opcional)" />
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Descontos -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Descontos" Icon="@Icons.Material.Filled.Discount">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudNumericField @bind-Value="DescontoIncondicionado"
+                                         Label="Desconto Incondicionado"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Desconto sem condições" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudNumericField @bind-Value="DescontoCondicionado"
+                                         Label="Desconto Condicionado"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Desconto com condições" />
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Deduções/Reduções -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Deduções/Reduções" Icon="@Icons.Material.Filled.Calculate">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudNumericField @bind-Value="ValorDeducaoReducao"
+                                         Label="Valor Dedução/Redução"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Valor para dedução da base de cálculo" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-4">
+                            Deduções mais complexas com documentos específicos serão implementadas em versão futura
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Tributação Municipal -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Tributação Municipal (ISSQN)" Icon="@Icons.Material.Filled.AccountBalance" IsInitiallyExpanded="true">
+                <MudGrid>
+                    <MudItem xs="12" md="4">
+                        <MudSelect @bind-Value="TipoTributacaoISSQN"
+                                   Label="Tributação ISSQN *"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true"
+                                   Required="true">
+                            <MudSelectItem Value="1">Operação Tributável</MudSelectItem>
+                            <MudSelectItem Value="2">Exportação de Serviço</MudSelectItem>
+                            <MudSelectItem Value="3">Não Incidência</MudSelectItem>
+                            <MudSelectItem Value="4">Imunidade</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="AliquotaISSQN"
+                                         Label="Alíquota ISSQN (%)"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="N2"
+                                         Min="0m"
+                                         Max="5m"
+                                         Validation="@(new Func<decimal?, string?>(ValidateAliquota))"
+                                         HelperText="Alíquota em percentual" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudSelect @bind-Value="TipoRetencaoISSQN"
+                                   Label="Retenção ISSQN *"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true"
+                                   Required="true">
+                            <MudSelectItem Value="1">Não Retido</MudSelectItem>
+                            <MudSelectItem Value="2">Retido pelo Tomador</MudSelectItem>
+                            <MudSelectItem Value="3">Retido pelo Intermediário</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Tributação Nacional -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Tributação Nacional (PIS/COFINS/Retenções)" Icon="@Icons.Material.Filled.Receipt">
+                <MudGrid>
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="ValorRetencaoCP"
+                                         Label="Retenção CP"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Contribuição Previdenciária" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="ValorRetencaoIRRF"
+                                         Label="Retenção IRRF"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Imposto de Renda Retido na Fonte" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="ValorRetencaoCSLL"
+                                         Label="Retenção CSLL"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Contribuição Social sobre Lucro Líquido" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Text">
+                            <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                            Tributação de PIS/COFINS detalhada será implementada em versão futura
+                        </MudAlert>
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Total de Tributos -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Total de Tributos" Icon="@Icons.Material.Filled.ReceiptLong">
+                <MudGrid>
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="Model.Trib.TotTrib.VTotTribFed"
+                                         Label="Total Tributos Federais"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Valor estimado" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="Model.Trib.TotTrib.VTotTribEst"
+                                         Label="Total Tributos Estaduais"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Valor estimado" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="Model.Trib.TotTrib.VTotTribMun"
+                                         Label="Total Tributos Municipais"
+                                         Variant="Variant.Outlined"
+                                         FullWidth="true"
+                                         Format="C"
+                                         Culture="CultureInfo.GetCultureInfo(\"pt-BR\")"
+                                         Min="0m"
+                                         HelperText="Incluindo ISSQN" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Valores estimados conforme Lei 12.741/2012. Podem ser deixados em zero se não disponíveis.
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Resumo dos Valores -->
+    <MudItem xs="12">
+        <MudCard Elevation="3" Class="mt-4">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">
+                        <MudIcon Icon="@Icons.Material.Filled.Calculate" Class="mr-2" />
+                        Resumo dos Valores
+                    </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudGrid>
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.subtitle2">Valor do Serviço:</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@Model.VServPrest.VServ.ToString("C")</MudText>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.subtitle2">Total Descontos:</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Warning">@TotalDescontos.ToString("C")</MudText>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.subtitle2">Total Retenções:</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Error">@TotalRetencoes.ToString("C")</MudText>
+                    </MudItem>
+                    <MudItem xs="6" md="3">
+                        <MudText Typo="Typo.subtitle2">Valor Líquido:</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Success">@ValorLiquido.ToString("C")</MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public ValoresModel Model { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<ValoresModel> ModelChanged { get; set; }
+
+    // Propriedades auxiliares para binding
+
+    private decimal? ValorRecebidoIntermediario
+    {
+        get => Model.VServPrest?.VReceb;
+        set
+        {
+            if (Model.VServPrest != null)
+                Model.VServPrest.VReceb = value;
+        }
+    }
+
+    private decimal? DescontoIncondicionado
+    {
+        get => Model.VDescCondIncond?.VDescIncond;
+        set
+        {
+            Model.VDescCondIncond ??= new DescontosModel();
+            Model.VDescCondIncond.VDescIncond = value;
+        }
+    }
+
+    private decimal? DescontoCondicionado
+    {
+        get => Model.VDescCondIncond?.VDescCond;
+        set
+        {
+            Model.VDescCondIncond ??= new DescontosModel();
+            Model.VDescCondIncond.VDescCond = value;
+        }
+    }
+
+    private decimal? ValorDeducaoReducao
+    {
+        get => Model.VDedRed?.VDR;
+        set
+        {
+            Model.VDedRed ??= new DeducoesModel();
+            Model.VDedRed.VDR = value;
+        }
+    }
+
+    private int TipoTributacaoISSQN
+    {
+        get => Model.Trib?.TribMun?.TribISSQN ?? 1;
+        set
+        {
+            if (Model.Trib?.TribMun != null)
+                Model.Trib.TribMun.TribISSQN = value;
+        }
+    }
+
+    private decimal? AliquotaISSQN
+    {
+        get => Model.Trib?.TribMun?.PAliq;
+        set
+        {
+            if (Model.Trib?.TribMun != null)
+                Model.Trib.TribMun.PAliq = value;
+        }
+    }
+
+    private int TipoRetencaoISSQN
+    {
+        get => Model.Trib?.TribMun?.TpRetISSQN ?? 1;
+        set
+        {
+            if (Model.Trib?.TribMun != null)
+                Model.Trib.TribMun.TpRetISSQN = value;
+        }
+    }
+
+    private decimal? ValorRetencaoCP
+    {
+        get => Model.Trib?.TribNac?.VRetCP;
+        set
+        {
+            Model.Trib ??= new TributacaoModel();
+            Model.Trib.TribNac ??= new TributacaoNacionalModel();
+            Model.Trib.TribNac.VRetCP = value;
+        }
+    }
+
+    private decimal? ValorRetencaoIRRF
+    {
+        get => Model.Trib?.TribNac?.VRetIRRF;
+        set
+        {
+            Model.Trib ??= new TributacaoModel();
+            Model.Trib.TribNac ??= new TributacaoNacionalModel();
+            Model.Trib.TribNac.VRetIRRF = value;
+        }
+    }
+
+    private decimal? ValorRetencaoCSLL
+    {
+        get => Model.Trib?.TribNac?.VRetCSLL;
+        set
+        {
+            Model.Trib ??= new TributacaoModel();
+            Model.Trib.TribNac ??= new TributacaoNacionalModel();
+            Model.Trib.TribNac.VRetCSLL = value;
+        }
+    }
+
+    // Propriedades calculadas
+
+    private decimal TotalDescontos =>
+        (DescontoIncondicionado ?? 0) +
+        (DescontoCondicionado ?? 0) +
+        (ValorDeducaoReducao ?? 0);
+
+    private decimal TotalRetencoes =>
+        (ValorRetencaoCP ?? 0) +
+        (ValorRetencaoIRRF ?? 0) +
+        (ValorRetencaoCSLL ?? 0);
+
+    private decimal ValorLiquido =>
+        Model.VServPrest?.VServ - TotalDescontos - TotalRetencoes ?? 0;
+
+    protected override void OnInitialized()
+    {
+        // Inicializar submodels se necessário
+        Model.VServPrest ??= new ValorServicoModel();
+        Model.Trib ??= new TributacaoModel();
+        Model.Trib.TribMun ??= new TributacaoMunicipalModel();
+        Model.Trib.TotTrib ??= new TotalTributosModel();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await ModelChanged.InvokeAsync(Model);
+    }
+
+    // Validações
+
+    private string? ValidateValorServico(decimal valor)
+    {
+        if (valor <= 0)
+            return "Valor do serviço deve ser maior que zero";
+        if (valor > 999999999.99m)
+            return "Valor muito alto";
+        return null;
+    }
+
+    private string? ValidateAliquota(decimal? aliquota)
+    {
+        if (!aliquota.HasValue)
+            return null;
+        if (aliquota < 0 || aliquota > 5)
+            return "Alíquota deve estar entre 0% e 5%";
+        return null;
+    }
+}

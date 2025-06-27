@@ -1,0 +1,70 @@
+﻿@using PocIntegracaoNfse.Core.Models.Validation
+
+@if (Result != null && (Result.Errors.Any() || Result.Warnings.Any()))
+{
+    <div class="@CssClass">
+        @if (Result.Errors.Any())
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-2">
+                <MudText Typo="Typo.subtitle2">
+                    @Result.Errors.Count erro(s) encontrado(s):
+                </MudText>
+                <ul class="ma-0 pl-4">
+                    @foreach (var error in Result.Errors.Take(MaxErrorsToShow))
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+                @if (Result.Errors.Count > MaxErrorsToShow)
+                {
+                    <MudText Typo="Typo.caption" Class="mt-2">
+                        + @(Result.Errors.Count - MaxErrorsToShow) erro(s) adicional(is)
+                    </MudText>
+                }
+            </MudAlert>
+        }
+
+        @if (Result.Warnings.Any())
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-2">
+                <MudText Typo="Typo.subtitle2">
+                    @Result.Warnings.Count aviso(s):
+                </MudText>
+                <ul class="ma-0 pl-4">
+                    @foreach (var warning in Result.Warnings.Take(MaxWarningsToShow))
+                    {
+                        <li>@warning</li>
+                    }
+                </ul>
+                @if (Result.Warnings.Count > MaxWarningsToShow)
+                {
+                    <MudText Typo="Typo.caption" Class="mt-2">
+                        + @(Result.Warnings.Count - MaxWarningsToShow) aviso(s) adicional(is)
+                    </MudText>
+                }
+            </MudAlert>
+        }
+
+        @if (Result.IsValid && Result.Warnings.Any())
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Text">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
+                Documento válido, mas com avisos que podem ser corrigidos.
+            </MudAlert>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public ValidationResult? Result { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public int MaxErrorsToShow { get; set; } = 5;
+
+    [Parameter]
+    public int MaxWarningsToShow { get; set; } = 3;
+}

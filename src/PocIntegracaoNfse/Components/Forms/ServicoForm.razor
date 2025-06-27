@@ -1,0 +1,221 @@
+﻿@using PocIntegracaoNfse.Models.DPS
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h6" Class="mb-4">Informações do Serviço Prestado</MudText>
+    </MudItem>
+
+    <!-- Local da Prestação -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Local da Prestação" Icon="@Icons.Material.Filled.LocationOn">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="Model.LocPrest.CLocPrestacao"
+                                      Label="Código Município Prestação (IBGE)"
+                                      Placeholder="7 dígitos do código IBGE"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      MaxLength="7"
+                                      Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="Model.LocPrest.CPaisPrestacao"
+                                      Label="Código País Prestação (ISO)"
+                                      Placeholder="2 letras do código ISO"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      MaxLength="2"
+                                      Validation="@(new Func<string, string?>(ValidateCodigoPais))" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            Informe o código do município onde o serviço foi prestado. Para serviços no exterior, informe o código do país.
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Código do Serviço -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Código e Descrição do Serviço" Icon="@Icons.Material.Filled.Code" IsInitiallyExpanded="true">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="Model.CServ.CTribNac"
+                                      Label="Código Tributação Nacional *"
+                                      Placeholder="6 dígitos (ex: 140101)"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Required="true"
+                                      MaxLength="6"
+                                      Validation="@(new Func<string, string?>(ValidateCodigoTributacaoNacional))"
+                                      HelperText="Item da Lista de Serviços (LC 116/2003)" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="Model.CServ.CTribMun"
+                                      Label="Código Tributação Municipal"
+                                      Placeholder="3 dígitos"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      MaxLength="3"
+                                      Validation="@(new Func<string, string?>(ValidateCodigoTributacaoMunicipal))"
+                                      HelperText="Código específico do município (opcional)" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="Model.CServ.XDescServ"
+                                      Label="Descrição do Serviço *"
+                                      Placeholder="Descrição detalhada do serviço prestado"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Required="true"
+                                      Lines="3"
+                                      MaxLength="2000"
+                                      Validation="@(new Func<string, string?>(ValidateDescricaoServico))"
+                                      HelperText="Descrição completa e detalhada do serviço" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="Model.CServ.CNBS"
+                                      Label="Código NBS"
+                                      Placeholder="9 dígitos"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      MaxLength="9"
+                                      Validation="@(new Func<string, string?>(ValidateCodigoNBS))"
+                                      HelperText="Nomenclatura Brasileira de Serviços" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="Model.CServ.CIntContrib"
+                                      Label="Código Interno"
+                                      Placeholder="Código interno do contribuinte"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      MaxLength="20"
+                                      HelperText="Código de controle interno (opcional)" />
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+
+    <!-- Informações Complementares -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Rounded="true">
+            <MudExpansionPanel Text="Informações Complementares" Icon="@Icons.Material.Filled.Info">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="InfoCompl.IdDocTec"
+                                      Label="ID Documento Técnico"
+                                      Placeholder="ART, RRT, DRT, etc."
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      MaxLength="40"
+                                      HelperText="Identificador de responsabilidade técnica" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="InfoCompl.DocRef"
+                                      Label="Documento de Referência"
+                                      Placeholder="Número do contrato, nota, etc."
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      MaxLength="255"
+                                      HelperText="Documento que originou este serviço" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="InfoCompl.XInfComp"
+                                      Label="Informações Complementares"
+                                      Placeholder="Observações gerais sobre o serviço"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Lines="3"
+                                      MaxLength="2000"
+                                      HelperText="Informações adicionais (opcional)" />
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public ServicoModel Model { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<ServicoModel> ModelChanged { get; set; }
+
+    private InformacoesComplementaresModel InfoCompl { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        // Inicializar submodels se necessário
+        Model.LocPrest ??= new LocalPrestacaoModel();
+        Model.CServ ??= new CodigoServicoModel();
+        Model.InfoCompl ??= new InformacoesComplementaresModel();
+        InfoCompl = Model.InfoCompl;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Model.InfoCompl = InfoCompl;
+        await ModelChanged.InvokeAsync(Model);
+    }
+
+    // Validações
+
+    private string? ValidateCodigoMunicipio(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+            return null;
+        if (codigo.Length != 7 || !codigo.All(char.IsDigit))
+            return "Código do município deve ter 7 dígitos";
+        return null;
+    }
+
+    private string? ValidateCodigoPais(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+            return null;
+        if (codigo.Length != 2 || !codigo.All(char.IsLetter))
+            return "Código do país deve ter 2 letras";
+        return null;
+    }
+
+    private string? ValidateCodigoTributacaoNacional(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+            return "Código de tributação nacional é obrigatório";
+        if (codigo.Length != 6 || !codigo.All(char.IsDigit))
+            return "Código deve ter 6 dígitos";
+        return null;
+    }
+
+    private string? ValidateCodigoTributacaoMunicipal(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+            return null;
+        if (codigo.Length != 3 || !codigo.All(char.IsDigit))
+            return "Código municipal deve ter 3 dígitos";
+        return null;
+    }
+
+    private string? ValidateDescricaoServico(string descricao)
+    {
+        if (string.IsNullOrWhiteSpace(descricao))
+            return "Descrição do serviço é obrigatória";
+        if (descricao.Length < 10)
+            return "Descrição deve ter pelo menos 10 caracteres";
+        return null;
+    }
+
+    private string? ValidateCodigoNBS(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+            return null;
+        if (codigo.Length != 9 || !codigo.All(char.IsDigit))
+            return "Código NBS deve ter 9 dígitos";
+        return null;
+    }
+}

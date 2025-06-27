@@ -1,0 +1,310 @@
+﻿@using PocIntegracaoNfse.Models.Common
+@using PocIntegracaoNfse.Models.Enums
+@inject IJSRuntime JSRuntime
+
+<MudGrid>
+    <!-- Tipo de Documento -->
+    <MudItem xs="12">
+        <MudRadioGroup @bind-SelectedOption="TipoDocumento" T="TipoDocumentoEnum">
+            <MudRadio Option="TipoDocumentoEnum.CNPJ" Color="Color.Primary">
+                Pessoa Jurídica (CNPJ)
+            </MudRadio>
+            <MudRadio Option="TipoDocumentoEnum.CPF" Color="Color.Primary">
+                Pessoa Física (CPF)
+            </MudRadio>
+            @if (AllowNIF)
+            {
+                <MudRadio Option="TipoDocumentoEnum.NIF" Color="Color.Primary">
+                    Estrangeiro (NIF)
+                </MudRadio>
+                <MudRadio Option="TipoDocumentoEnum.SemNIF" Color="Color.Primary">
+                    Sem NIF
+                </MudRadio>
+            }
+        </MudRadioGroup>
+    </MudItem>
+
+    <!-- Documento -->
+    <MudItem xs="12" md="6">
+        @switch (TipoDocumento)
+        {
+            case TipoDocumentoEnum.CNPJ:
+                <MudTextField @bind-Value="Model.CNPJ"
+                              Label="CNPJ"
+                              Placeholder="00.000.000/0000-00"
+                              Variant="Variant.Outlined"
+                              FullWidth="true"
+                              OnBlur="@(async () => await OnCNPJChange(Model.CNPJ))"
+                              Validation="@(new Func<string, string?>(ValidateCNPJ))"
+                              Immediate="true" />
+                break;
+            case TipoDocumentoEnum.CPF:
+                <MudTextField @bind-Value="Model.CPF"
+                              Label="CPF"
+                              Placeholder="000.000.000-00"
+                              Variant="Variant.Outlined"
+                              FullWidth="true"
+                              OnBlur="@(async () => await OnCPFChange(Model.CPF))"
+                              Validation="@(new Func<string, string?>(ValidateCPF))"
+                              Immediate="true" />
+                break;
+            case TipoDocumentoEnum.NIF:
+                <MudTextField @bind-Value="Model.NIF"
+                              Label="NIF"
+                              Placeholder="Número de Identificação Fiscal"
+                              Variant="Variant.Outlined"
+                              FullWidth="true"
+                              MaxLength="40" />
+                break;
+            case TipoDocumentoEnum.SemNIF:
+                <MudSelect @bind-Value="Model.CNaoNIF"
+                           Label="Motivo para não informar NIF"
+                           Variant="Variant.Outlined"
+                           FullWidth="true">
+                    <MudSelectItem Value="MotivoNaoNIF.DispensadoNIF">Dispensado do NIF</MudSelectItem>
+                    <MudSelectItem Value="MotivoNaoNIF.NaoExigenciaNIF">Não exigência do NIF</MudSelectItem>
+                </MudSelect>
+                break;
+        }
+    </MudItem>
+
+    <!-- CAEPF (apenas para CPF) -->
+    @if (TipoDocumento == TipoDocumentoEnum.CPF)
+    {
+        <MudItem xs="12" md="6">
+            <MudTextField @bind-Value="Model.CAEPF"
+                          Label="CAEPF"
+                          Placeholder="Cadastro de Atividade Econômica da Pessoa Física"
+                          Variant="Variant.Outlined"
+                          FullWidth="true"
+                          Validation="@(new Func<string, string?>(ValidateCAEPF))" />
+        </MudItem>
+    }
+
+    <!-- Inscrição Municipal -->
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="Model.IM"
+                      Label="Inscrição Municipal"
+                      Placeholder="Número da inscrição municipal"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      MaxLength="15" />
+    </MudItem>
+
+    <!-- Nome/Razão Social -->
+    <MudItem xs="12" md="@(TipoDocumento == TipoDocumentoEnum.CPF ? 6 : 12)">
+        <MudTextField @bind-Value="Model.XNome"
+                      Label="@(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Razão Social" : "Nome Completo")"
+                      Placeholder="@(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Nome empresarial" : "Nome da pessoa física")"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Required="@IsRequired"
+                      MaxLength="300"
+                      Validation="@(new Func<string, string?>(ValidateName))" />
+    </MudItem>
+
+    <!-- Contato -->
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="Model.Fone"
+                      Label="Telefone"
+                      Placeholder="(11) 99999-9999"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      Validation="@(new Func<string, string?>(ValidatePhone))" />
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="Model.Email"
+                      Label="E-mail"
+                      Placeholder="contato@empresa.com.br"
+                      Variant="Variant.Outlined"
+                      FullWidth="true"
+                      InputType="InputType.Email"
+                      Validation="@(new Func<string, string?>(ValidateEmail))" />
+    </MudItem>
+
+    <!-- Endereço -->
+    @if (ShowEndereco && Model.End != null)
+    {
+        <MudItem xs="12">
+            <MudDivider Class="my-4" />
+            <MudText Typo="Typo.h6" Class="mb-4">Endereço</MudText>
+            <EnderecoForm @bind-Model="Model.End" IsRequired="@EnderecoObrigatorio" />
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Parameter]
+    public PessoaBaseModel Model { get; set; } = new TomadorModel();
+
+    [Parameter]
+    public EventCallback<PessoaBaseModel> ModelChanged { get; set; }
+
+    [Parameter]
+    public bool IsRequired { get; set; } = true;
+
+    [Parameter]
+    public bool AllowNIF { get; set; } = true;
+
+    [Parameter]
+    public bool ShowEndereco { get; set; } = true;
+
+    [Parameter]
+    public bool EnderecoObrigatorio { get; set; } = false;
+
+    [Parameter]
+    public string PessoaTipo { get; set; } = "pessoa";
+
+    private TipoDocumentoEnum _tipoDocumento = TipoDocumentoEnum.CNPJ;
+
+    private TipoDocumentoEnum TipoDocumento
+    {
+        get => _tipoDocumento;
+        set
+        {
+            if (_tipoDocumento != value)
+            {
+                _tipoDocumento = value;
+                LimparDocumentos();
+                StateHasChanged();
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Determinar tipo de documento baseado no model
+        if (!string.IsNullOrWhiteSpace(Model.CNPJ))
+            TipoDocumento = TipoDocumentoEnum.CNPJ;
+        else if (!string.IsNullOrWhiteSpace(Model.CPF))
+            TipoDocumento = TipoDocumentoEnum.CPF;
+        else if (!string.IsNullOrWhiteSpace(Model.NIF))
+            TipoDocumento = TipoDocumentoEnum.NIF;
+        else if (Model.CNaoNIF.HasValue)
+            TipoDocumento = TipoDocumentoEnum.SemNIF;
+
+        // Inicializar endereço se necessário
+        if (ShowEndereco && Model.End == null)
+        {
+            Model.End = new EnderecoModel();
+        }
+    }
+
+    private void LimparDocumentos()
+    {
+        Model.CNPJ = null;
+        Model.CPF = null;
+        Model.NIF = null;
+        Model.CNaoNIF = null;
+        Model.CAEPF = null;
+    }
+
+    private async Task OnCNPJChange(string? cnpj)
+    {
+        if (!string.IsNullOrWhiteSpace(cnpj))
+        {
+            // Aplicar máscara
+            var maskedCnpj = await JSRuntime.InvokeAsync<string>("maskCNPJ", cnpj);
+            if (maskedCnpj != cnpj)
+            {
+                Model.CNPJ = maskedCnpj;
+                await ModelChanged.InvokeAsync(Model);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task OnCPFChange(string? cpf)
+    {
+        if (!string.IsNullOrWhiteSpace(cpf))
+        {
+            // Aplicar máscara
+            var maskedCpf = await JSRuntime.InvokeAsync<string>("maskCPF", cpf);
+            if (maskedCpf != cpf)
+            {
+                Model.CPF = maskedCpf;
+                await ModelChanged.InvokeAsync(Model);
+                StateHasChanged();
+            }
+        }
+    }
+
+    // Validações
+    private string? ValidateCNPJ(string cnpj)
+    {
+        if (TipoDocumento != TipoDocumentoEnum.CNPJ)
+            return null;
+        if (string.IsNullOrWhiteSpace(cnpj) && IsRequired)
+            return "CNPJ é obrigatório";
+        var digits = new string(cnpj.Where(char.IsDigit).ToArray());
+        if (digits.Length != 14)
+            return "CNPJ deve ter 14 dígitos";
+        // TODO: Implementar validação completa de CNPJ
+        return null;
+    }
+
+    private string? ValidateCPF(string cpf)
+    {
+        if (TipoDocumento != TipoDocumentoEnum.CPF)
+            return null;
+        if (string.IsNullOrWhiteSpace(cpf) && IsRequired)
+            return "CPF é obrigatório";
+        var digits = new string(cpf.Where(char.IsDigit).ToArray());
+        if (digits.Length != 11)
+            return "CPF deve ter 11 dígitos";
+        // TODO: Implementar validação completa de CPF
+        return null;
+    }
+
+    private string? ValidateCAEPF(string caepf)
+    {
+        if (string.IsNullOrWhiteSpace(caepf))
+            return null;
+        var digits = new string(caepf.Where(char.IsDigit).ToArray());
+        if (digits.Length != 14)
+            return "CAEPF deve ter 14 dígitos";
+        return null;
+    }
+
+    private string? ValidateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name) && IsRequired)
+            return $"{(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Razão Social" : "Nome")} é obrigatório";
+        if (!string.IsNullOrWhiteSpace(name) && name.Length < 2)
+            return "Nome deve ter pelo menos 2 caracteres";
+        return null;
+    }
+
+    private string? ValidatePhone(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+            return null;
+        var digits = new string(phone.Where(char.IsDigit).ToArray());
+        if (digits.Length < 10 || digits.Length > 11)
+            return "Telefone deve ter 10 ou 11 dígitos";
+        return null;
+    }
+
+    private string? ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return null;
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email ? null : "E-mail inválido";
+        }
+        catch
+        {
+            return "E-mail inválido";
+        }
+    }
+
+    private enum TipoDocumentoEnum
+    {
+        CNPJ,
+        CPF,
+        NIF,
+        SemNIF
+    }
+}

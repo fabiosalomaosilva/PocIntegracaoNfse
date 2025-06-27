@@ -1,5 +1,350 @@
-﻿<h3>DpsForm</h3>
+﻿@using PocIntegracaoNfse.Models.Enums
+@using PocIntegracaoNfse.Core.Models.Validation
+@using PocIntegracaoNfse.Models.Common
+@using PocIntegracaoNfse.Models.DPS
+
+<BaseForm Title="Declaração de Prestação de Serviços (DPS)"
+          Subtitle="Formulário principal para criação da DPS"
+          Icon="@Icons.Material.Filled.Assignment"
+          IsLoading="IsLoading"
+          ValidationResult="ValidationResult"
+          OnSave="HandleSave"
+          OnValidate="HandleValidate"
+          OnClear="HandleClear">
+    <MudTabs Elevation="2" Rounded="true" Color="Color.Primary" PanelClass="pa-4">
+        <!-- Tab 1: Identificação -->
+        <MudTabPanel Text="Identificação" Icon="@Icons.Material.Filled.Badge">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">Dados de Identificação da DPS</MudText>
+                </MudItem>
+                <!-- Ambiente -->
+                <MudItem xs="12" md="3">
+                    <MudSelect @bind-Value="Model.InfDPS.TpAmb"
+                               Label="Ambiente"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true">
+                        <MudSelectItem Value="TipoAmbiente.Homologacao">Homologação</MudSelectItem>
+                        <MudSelectItem Value="TipoAmbiente.Producao">Produção</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <!-- Série -->
+                <MudItem xs="12" md="3">
+                    <MudTextField @bind-Value="Model.InfDPS.Serie"
+                                  Label="Série"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="5"
+                                  Validation="@(new Func<string, string?>(ValidateSerie))" />
+                </MudItem>
+                <!-- Número -->
+                <MudItem xs="12" md="3">
+                    <MudTextField @bind-Value="Model.InfDPS.NDPS"
+                                  Label="Número DPS"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="15"
+                                  Validation="@(new Func<string, string?>(ValidateNumero))" />
+                </MudItem>
+                <!-- Versão Aplicativo -->
+                <MudItem xs="12" md="3">
+                    <MudTextField @bind-Value="Model.InfDPS.VerAplic"
+                                  Label="Versão Aplicativo"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="20" />
+                </MudItem>
+                <!-- Data Emissão -->
+                <MudItem xs="12" md="6">
+                    <MudDatePicker @bind-Date="DataEmissao"
+                                   Label="Data de Emissão"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true"
+                                   Required="true"
+                                   DateFormat="dd/MM/yyyy" />
+                </MudItem>
+                <!-- Data Competência -->
+                <MudItem xs="12" md="6">
+                    <MudDatePicker @bind-Date="DataCompetencia"
+                                   Label="Data de Competência"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true"
+                                   Required="true"
+                                   DateFormat="dd/MM/yyyy" />
+                </MudItem>
+                <!-- Tipo Emitente -->
+                <MudItem xs="12" md="6">
+                    <MudSelect @bind-Value="Model.InfDPS.TpEmit"
+                               Label="Emitente da DPS"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true">
+                        <MudSelectItem Value="EmitenteDPS.Prestador">Prestador</MudSelectItem>
+                        <MudSelectItem Value="EmitenteDPS.Tomador">Tomador</MudSelectItem>
+                        <MudSelectItem Value="EmitenteDPS.Intermediario">Intermediário</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <!-- Código Município Emissor -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfDPS.CLocEmi"
+                                  Label="Código Município Emissor (IBGE)"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="7"
+                                  Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+
+        <!-- Tab 2: Prestador -->
+        <MudTabPanel Text="Prestador" Icon="@Icons.Material.Filled.Business">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">Dados do Prestador de Serviços</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <PessoaForm @bind-Model="Model.InfDPS.Prest"
+                                IsRequired="true"
+                                PessoaTipo="prestador"
+                                EnderecoObrigatorio="false" />
+                </MudItem>
+                <!-- Regimes Tributários -->
+                <MudItem xs="12">
+                    <MudDivider Class="my-4" />
+                    <MudText Typo="Typo.h6" Class="mb-4">Regimes de Tributação</MudText>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudSelect @bind-Value="Model.InfDPS.Prest.RegTrib.OpSimpNac"
+                               Label="Situação - Simples Nacional"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true">
+                        <MudSelectItem Value="SituacaoSimplesNacional.NaoOptante">Não Optante</MudSelectItem>
+                        <MudSelectItem Value="SituacaoSimplesNacional.OptanteMEI">Optante - MEI</MudSelectItem>
+                        <MudSelectItem Value="SituacaoSimplesNacional.OptanteMEEPP">Optante - ME/EPP</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                @if (Model.InfDPS.Prest.RegTrib.OpSimpNac == SituacaoSimplesNacional.OptanteMEEPP)
+                {
+                    <MudItem xs="12" md="4">
+                        <MudSelect @bind-Value="Model.InfDPS.Prest.RegTrib.RegApTribSN"
+                                   Label="Regime de Apuração SN"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true">
+                            <MudSelectItem Value="RegimeApuracaoSimplesNacional.TributosFederaisEMunicipalSN">
+                                Federal e Municipal pelo SN
+                            </MudSelectItem>
+                            <MudSelectItem Value="RegimeApuracaoSimplesNacional.TributosFederaisSNISSQNForaSN">
+                                Federal SN, ISSQN fora SN
+                            </MudSelectItem>
+                            <MudSelectItem Value="RegimeApuracaoSimplesNacional.TributosFederaisEMunicipalForaSN">
+                                Federal e Municipal fora SN
+                            </MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                }
+                <MudItem xs="12" md="4">
+                    <MudSelect @bind-Value="Model.InfDPS.Prest.RegTrib.RegEspTrib"
+                               Label="Regime Especial de Tributação"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true">
+                        <MudSelectItem Value="RegimeEspecialTributacao.Nenhum">Nenhum</MudSelectItem>
+                        <MudSelectItem Value="RegimeEspecialTributacao.AtoCooperado">Ato Cooperado</MudSelectItem>
+                        <MudSelectItem Value="RegimeEspecialTributacao.Estimativa">Estimativa</MudSelectItem>
+                        <MudSelectItem Value="RegimeEspecialTributacao.MicroempresaMunicipal">Microempresa Municipal</MudSelectItem>
+                        <MudSelectItem Value="RegimeEspecialTributacao.NotarioRegistrador">Notário/Registrador</MudSelectItem>
+                        <MudSelectItem Value="RegimeEspecialTributacao.ProfissionalAutonomo">Profissional Autônomo</MudSelectItem>
+                        <MudSelectItem Value="RegimeEspecialTributacao.SociedadeProfissionais">Sociedade de Profissionais</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+
+        <!-- Tab 3: Tomador -->
+        <MudTabPanel Text="Tomador" Icon="@Icons.Material.Filled.Person">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">Dados do Tomador de Serviços</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-4">
+                        Os dados do tomador são opcionais, mas recomendados
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSwitch @bind-Checked="TemTomador"
+                               Label="Informar dados do tomador"
+                               Color="Color.Primary" />
+                </MudItem>
+                @if (TemTomador)
+                {
+                    <MudItem xs="12">
+                        <PessoaForm @bind-Model="Model.InfDPS.Toma"
+                                    IsRequired="false"
+                                    PessoaTipo="tomador"
+                                    EnderecoObrigatorio="false" />
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudTabPanel>
+
+        <!-- Tab 4: Serviço -->
+        <MudTabPanel Text="Serviço" Icon="@Icons.Material.Filled.WorkOutline">
+            <ServicoForm @bind-Model="Model.InfDPS.Serv" />
+        </MudTabPanel>
+
+        <!-- Tab 5: Valores -->
+        <MudTabPanel Text="Valores" Icon="@Icons.Material.Filled.AttachMoney">
+            <ValoresForm @bind-Model="Model.InfDPS.Valores" />
+        </MudTabPanel>
+    </MudTabs>
+</BaseForm>
 
 @code {
+    [Parameter] public DpsModel Model { get; set; } = new();
+    [Parameter] public EventCallback<DpsModel> ModelChanged { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public ValidationResult? ValidationResult { get; set; }
+    [Parameter] public EventCallback<DpsModel> OnSave { get; set; }
+    [Parameter] public EventCallback<DpsModel> OnValidate { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
 
+    private bool TemTomador { get; set; }
+
+    // Propriedades auxiliares para binding de datas
+    private DateTime? DataEmissao
+    {
+        get => Model.InfDPS?.DhEmi;
+        set
+        {
+            if (Model.InfDPS != null && value.HasValue)
+            {
+                Model.InfDPS.DhEmi = value.Value;
+            }
+        }
+    }
+
+    private DateTime? DataCompetencia
+    {
+        get => Model.InfDPS?.DCompet.ToDateTime(TimeOnly.MinValue);
+        set
+        {
+            if (Model.InfDPS != null && value.HasValue)
+            {
+                Model.InfDPS.DCompet = DateOnly.FromDateTime(value.Value);
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Inicializar model se necessário
+        if (Model.InfDPS == null)
+        {
+            InitializeDefaultModel();
+        }
+        // Verificar se já tem tomador
+        TemTomador = Model.InfDPS?.Toma != null;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Gerenciar criação/remoção do tomador
+        if (TemTomador && Model.InfDPS?.Toma == null)
+        {
+            Model.InfDPS!.Toma = new TomadorModel();
+        }
+        else if (!TemTomador && Model.InfDPS?.Toma != null)
+        {
+            Model.InfDPS.Toma = null;
+        }
+        await ModelChanged.InvokeAsync(Model);
+    }
+
+    private void InitializeDefaultModel()
+    {
+        Model = new DpsModel
+        {
+            InfDPS = new InfDpsModel
+            {
+                Id = $"DPS{DateTime.Now:yyyyMMddHHmmss}",
+                TpAmb = TipoAmbiente.Homologacao,
+                DhEmi = DateTime.Now,
+                VerAplic = "1.00",
+                Serie = "00001",
+                NDPS = "1",
+                DCompet = DateOnly.FromDateTime(DateTime.Now),
+                TpEmit = EmitenteDPS.Prestador,
+                CLocEmi = string.Empty,
+                Prest = new PrestadorModel
+                {
+                    RegTrib = new RegimeTributarioModel
+                    {
+                        OpSimpNac = SituacaoSimplesNacional.NaoOptante,
+                        RegEspTrib = RegimeEspecialTributacao.Nenhum
+                    }
+                },
+                Serv = new ServicoModel
+                {
+                    LocPrest = new LocalPrestacaoModel(),
+                    CServ = new CodigoServicoModel()
+                },
+                Valores = new ValoresModel
+                {
+                    VServPrest = new ValorServicoModel(),
+                    Trib = new TributacaoModel
+                    {
+                        TribMun = new TributacaoMunicipalModel(),
+                        TotTrib = new TotalTributosModel()
+                    }
+                }
+            }
+        };
+    }
+
+    private async Task HandleSave()
+    {
+        await OnSave.InvokeAsync(Model);
+    }
+
+    private async Task HandleValidate()
+    {
+        await OnValidate.InvokeAsync(Model);
+    }
+
+    private async Task HandleClear()
+    {
+        InitializeDefaultModel();
+        TemTomador = false;
+        await OnClear.InvokeAsync();
+        StateHasChanged();
+    }
+
+    // Validações
+    private string? ValidateSerie(string serie)
+    {
+        if (string.IsNullOrWhiteSpace(serie)) return "Série é obrigatória";
+        if (serie.Length > 5) return "Série deve ter no máximo 5 caracteres";
+        return null;
+    }
+
+    private string? ValidateNumero(string numero)
+    {
+        if (string.IsNullOrWhiteSpace(numero)) return "Número é obrigatório";
+        if (!numero.All(char.IsDigit)) return "Número deve conter apenas dígitos";
+        if (numero.Length > 15) return "Número deve ter no máximo 15 dígitos";
+        if (numero.StartsWith("0")) return "Número não pode começar com zero";
+        return null;
+    }
+
+    private string? ValidateCodigoMunicipio(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo)) return "Código do município é obrigatório";
+        if (codigo.Length != 7 || !codigo.All(char.IsDigit)) return "Código deve ter 7 dígitos";
+        return null;
+    }
 }
