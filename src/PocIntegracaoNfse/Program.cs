@@ -1,10 +1,23 @@
+using CurrieTechnologies.Razor.SweetAlert2;
+using MudBlazor.Services;
 using PocIntegracaoNfse.Components;
+using PocIntegracaoNfse.Core.Services;
+using PocIntegracaoNfse.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddMudServices();
+builder.Services.AddSweetAlert2();
+
+// Add application services
+builder.Services.AddScoped<XmlService>();
+builder.Services.AddScoped<XmlGeneratorService>();
+builder.Services.AddScoped<XmlValidationService>();
+builder.Services.AddScoped<XmlParserService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,76 @@
+﻿@inject IJSRuntime JSRuntime
+
+<MudCard Class="@Class" Style="@Style">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Title</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy"
+                           Size="Size.Small"
+                           OnClick="CopyToClipboard" />
+            <MudIconButton Icon="@Icons.Material.Filled.Download"
+                           Size="Size.Small"
+                           OnClick="DownloadXml" />
+            <MudIconButton Icon="@Icons.Material.Filled.Fullscreen"
+                           Size="Size.Small"
+                           OnClick="ToggleFullscreen" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent Class="pa-2">
+        <MudPaper Class="xml-container" Elevation="0" Style="@ContainerStyle">
+            <div id="@_elementId" class="xml-content">@XmlContent</div>
+        </MudPaper>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public string Title { get; set; } = "XML";
+    [Parameter] public string XmlContent { get; set; } = string.Empty;
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string Style { get; set; } = string.Empty;
+    [Parameter] public string FileName { get; set; } = "document.xml";
+    [Parameter] public EventCallback<bool> OnFullscreenToggle { get; set; }
+
+    private readonly string _elementId = $"xml-display-{Guid.NewGuid():N}";
+    private bool _isFullscreen = false;
+
+    private string ContainerStyle => _isFullscreen ? "height: 80vh;" : "height: 400px;";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !string.IsNullOrEmpty(XmlContent))
+        {
+            await JSRuntime.InvokeVoidAsync("highlightXml", _elementId);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(XmlContent))
+        {
+            await Task.Delay(100); // Aguardar renderização
+            await JSRuntime.InvokeVoidAsync("highlightXml", _elementId);
+        }
+    }
+
+    private async Task CopyToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", XmlContent);
+        // Adicionar feedback visual aqui
+    }
+
+    private async Task DownloadXml()
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(XmlContent);
+        var base64 = Convert.ToBase64String(bytes);
+        await JSRuntime.InvokeVoidAsync("downloadFileFromBase64", base64, FileName, "application/xml");
+    }
+
+    private async Task ToggleFullscreen()
+    {
+        _isFullscreen = !_isFullscreen;
+        await OnFullscreenToggle.InvokeAsync(_isFullscreen);
+        StateHasChanged();
+    }
+}

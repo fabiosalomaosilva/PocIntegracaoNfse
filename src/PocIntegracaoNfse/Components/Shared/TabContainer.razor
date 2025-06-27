@@ -1,0 +1,14 @@
+﻿<MudTabs Elevation="2"
+         Rounded="true"
+         Color="Color.Primary"
+         PanelClass="@PanelClass"
+         @bind-ActivePanelIndex="ActiveIndex">
+    @ChildContent
+</MudTabs>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string PanelClass { get; set; } = "pa-4";
+    [Parameter] public int ActiveIndex { get; set; } = 0;
+    [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+}

@@ -1,0 +1,234 @@
+@page "/admin/dashboard"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Admin Dashboard - NFSe</PageTitle>
+
+<div class="fade-in">
+    <MudGrid>
+        <!-- Header -->
+        <MudItem xs="12">
+            <MudCard Class="mb-4">
+                <MudCardContent>
+                    <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <div>
+                            <MudText Typo="Typo.h4" Color="Color.Primary">
+                                Painel Administrativo
+                            </MudText>
+                            <MudText Typo="Typo.body1" Color="Color.Secondary">
+                                Monitoramento e configurações do sistema
+                            </MudText>
+                        </div>
+                        <MudButton Variant="Variant.Filled" 
+                                   Color="Color.Primary" 
+                                   StartIcon="@Icons.Material.Filled.Refresh">
+                            Atualizar
+                        </MudButton>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Métricas do Sistema -->
+        <MudItem xs="12" md="3">
+            <MudCard>
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Speed" Size="Size.Large" Color="Color.Primary" Class="mb-2" />
+                    <MudText Typo="Typo.h6">Performance</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Success">98%</MudText>
+                    <MudText Typo="Typo.caption">Uptime do sistema</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="3">
+            <MudCard>
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Memory" Size="Size.Large" Color="Color.Info" Class="mb-2" />
+                    <MudText Typo="Typo.h6">Memória</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Info">2.1 GB</MudText>
+                    <MudText Typo="Typo.caption">Uso atual</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="3">
+            <MudCard>
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Storage" Size="Size.Large" Color="Color.Warning" Class="mb-2" />
+                    <MudText Typo="Typo.h6">Armazenamento</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Warning">45 GB</MudText>
+                    <MudText Typo="Typo.caption">Espaço usado</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="3">
+            <MudCard>
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.People" Size="Size.Large" Color="Color.Success" Class="mb-2" />
+                    <MudText Typo="Typo.h6">Usuários Ativos</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Success">124</MudText>
+                    <MudText Typo="Typo.caption">Últimas 24h</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Logs Recentes -->
+        <MudItem xs="12" md="8">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Logs do Sistema</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.FilterList" Size="Size.Small" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Download" Size="Size.Small" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTable Items="@_systemLogs" Dense="true" Hover="true" FixedHeader="true" Height="400px">
+                        <HeaderContent>
+                            <MudTh>Timestamp</MudTh>
+                            <MudTh>Nível</MudTh>
+                            <MudTh>Módulo</MudTh>
+                            <MudTh>Mensagem</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Timestamp">@context.Timestamp.ToString("dd/MM HH:mm:ss")</MudTd>
+                            <MudTd DataLabel="Nível">
+                                <MudChip Size="Size.Small" Color="@GetLogLevelColor(context.Level)" T="string">
+                                    @context.Level
+                                </MudChip>
+                            </MudTd>
+                            <MudTd DataLabel="Módulo">@context.Module</MudTd>
+                            <MudTd DataLabel="Mensagem">@context.Message</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Configurações Rápidas -->
+        <MudItem xs="12" md="4">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Configurações</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudStack Spacing="3">
+                        <MudSwitch @bind-Checked="_maintenanceMode" 
+                                   Label="Modo Manutenção" 
+                                   Color="Color.Warning" 
+                                   T="bool" />
+                        
+                        <MudSwitch @bind-Checked="_debugMode" 
+                                   Label="Debug Ativo" 
+                                   Color="Color.Info" 
+                                   T="bool" />
+                        
+                        <MudSwitch @bind-Checked="_autoBackup" 
+                                   Label="Backup Automático" 
+                                   Color="Color.Success"
+                                   T="bool" />
+                        
+                        <MudDivider />
+                        
+                        <MudButton Variant="Variant.Outlined" 
+                                   Color="Color.Primary" 
+                                   StartIcon="@Icons.Material.Filled.CleaningServices"
+                                   FullWidth="true">
+                            Limpar Cache
+                        </MudButton>
+                        
+                        <MudButton Variant="Variant.Outlined" 
+                                   Color="Color.Warning" 
+                                   StartIcon="@Icons.Material.Filled.RestartAlt"
+                                   FullWidth="true">
+                            Reiniciar Serviços
+                        </MudButton>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Certificados -->
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Certificados Digitais</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudButton StartIcon="@Icons.Material.Filled.Add" Size="Size.Small">
+                            Adicionar
+                        </MudButton>
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudAlert Severity="Severity.Info" Class="mb-4">
+                        Gerenciamento de certificados será implementado na próxima fase
+                    </MudAlert>
+                    
+                    <MudSimpleTable Dense="true">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Válido Até</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Certificado Empresa Demo</td>
+                                <td>A1</td>
+                                <td>31/12/2025</td>
+                                <td><MudChip Size="Size.Small" Color="Color.Success" T="string">Ativo</MudChip></td>
+                                <td>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" Size="Size.Small" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    private bool _maintenanceMode = false;
+    private bool _debugMode = true;
+    private bool _autoBackup = true;
+
+    private List<SystemLog> _systemLogs = new()
+    {
+        new() { Timestamp = DateTime.Now.AddMinutes(-5), Level = "INFO", Module = "XmlValidator", Message = "XML validado com sucesso" },
+        new() { Timestamp = DateTime.Now.AddMinutes(-8), Level = "WARN", Module = "XmlGenerator", Message = "Schema XSD desatualizado detectado" },
+        new() { Timestamp = DateTime.Now.AddMinutes(-12), Level = "ERROR", Module = "DigitalSignature", Message = "Falha na assinatura digital" },
+        new() { Timestamp = DateTime.Now.AddMinutes(-15), Level = "INFO", Module = "XmlParser", Message = "DPS importada com sucesso" },
+        new() { Timestamp = DateTime.Now.AddMinutes(-18), Level = "DEBUG", Module = "ValidationService", Message = "Executando validação customizada" }
+    };
+
+    private Color GetLogLevelColor(string level) => level switch
+    {
+        "ERROR" => Color.Error,
+        "WARN" => Color.Warning,
+        "INFO" => Color.Info,
+        "DEBUG" => Color.Secondary,
+        _ => Color.Default
+    };
+
+    private class SystemLog
+    {
+        public DateTime Timestamp { get; set; }
+        public string Level { get; set; } = string.Empty;
+        public string Module { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+    }
+}

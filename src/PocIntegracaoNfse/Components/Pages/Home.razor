@@ -1,7 +1,225 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
 
-<PageTitle>Home</PageTitle>
+<PageTitle>NFSe - Dashboard</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="fade-in">
+    <MudGrid>
+        <!-- Header -->
+        <MudItem xs="12">
+            <MudCard Class="mb-4">
+                <MudCardContent>
+                    <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <div>
+                            <MudText Typo="Typo.h4" Color="Color.Primary">
+                                Sistema de Integração NFSe
+                            </MudText>
+                            <MudText Typo="Typo.body1" Color="Color.Secondary">
+                                Sistema Nacional NFS-e - Edição e Validação de XML
+                            </MudText>
+                        </div>
+                        <MudIcon Icon="Icons.Material.Filled.Description"
+                                 Style="font-size: 4rem;"
+                                 Color="Color.Primary" />
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
-Welcome to your new app.
+        <!-- Cards de Status -->
+        <MudItem xs="12" md="3">
+            <MudCard Class="status-card info-card">
+                <MudCardContent>
+                    <MudIcon Icon="Icons.Material.Filled.Assignment"
+                             Color="Color.Primary"
+                             Class="status-icon" />
+                    <MudText Typo="Typo.h6">DPS Criadas</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Primary">@_dpsCount</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="3">
+            <MudCard Class="status-card info-card">
+                <MudCardContent>
+                    <MudIcon Icon="Icons.Material.Filled.CheckCircle"
+                             Color="Color.Success"
+                             Class="status-icon" />
+                    <MudText Typo="Typo.h6">XML Válidos</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Success">@_validXmlCount</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="3">
+            <MudCard Class="status-card info-card">
+                <MudCardContent>
+                    <MudIcon Icon="Icons.Material.Filled.Security"
+                             Color="Color.Warning"
+                             Class="status-icon" />
+                    <MudText Typo="Typo.h6">XML Assinados</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Warning">@_signedXmlCount</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="3">
+            <MudCard Class="status-card info-card">
+                <MudCardContent>
+                    <MudIcon Icon="Icons.Material.Filled.Error"
+                             Color="Color.Error"
+                             Class="status-icon" />
+                    <MudText Typo="Typo.h6">Erros</MudText>
+                    <MudText Typo="Typo.h4" Color="Color.Error">@_errorCount</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Ações Rápidas -->
+        <MudItem xs="12" md="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Ações Rápidas</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="Icons.Material.Filled.MoreVert" Color="Color.Default" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudStack Spacing="3">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Href="/dps/novo"
+                                   FullWidth="true">
+                            Nova DPS
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Upload"
+                                   Href="/xml-editor"
+                                   FullWidth="true">
+                            Importar XML
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Secondary"
+                                   StartIcon="@Icons.Material.Filled.Visibility"
+                                   Href="/xml-viewer"
+                                   FullWidth="true">
+                            Visualizar XML
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Tertiary"
+                                   StartIcon="@Icons.Material.Filled.CheckCircle"
+                                   Href="/xml-validator"
+                                   FullWidth="true">
+                            Validar XML
+                        </MudButton>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Últimas Atividades -->
+        <MudItem xs="12" md="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Últimas Atividades</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTimeline TimelineOrientation="TimelineOrientation.Vertical">
+                        @foreach (var activity in _recentActivities)
+                        {
+                            <MudTimelineItem Color="@activity.Color" Icon="@activity.Icon">
+                                <MudText Typo="Typo.body2">@activity.Description</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@activity.Timestamp.ToString("dd/MM/yyyy HH:mm")</MudText>
+                            </MudTimelineItem>
+                        }
+                    </MudTimeline>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Documentação -->
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Documentação e Ajuda</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="12" md="4">
+                            <MudButton Variant="Variant.Text"
+                                       StartIcon="@Icons.Material.Filled.MenuBook"
+                                       Href="/docs/schemas"
+                                       FullWidth="true">
+                                Documentação dos Schemas
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudButton Variant="Variant.Text"
+                                       StartIcon="@Icons.Material.Filled.Code"
+                                       Href="/docs/api"
+                                       FullWidth="true">
+                                API de Integração
+                            </MudButton>
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudButton Variant="Variant.Text"
+                                       StartIcon="@Icons.Material.Filled.Help"
+                                       Href="/ajuda"
+                                       FullWidth="true">
+                                Central de Ajuda
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    private int _dpsCount = 0;
+    private int _validXmlCount = 0;
+    private int _signedXmlCount = 0;
+    private int _errorCount = 0;
+
+    private List<ActivityItem> _recentActivities = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simular carregamento de dados
+        await Task.Delay(500);
+
+        _dpsCount = 12;
+        _validXmlCount = 10;
+        _signedXmlCount = 8;
+        _errorCount = 2;
+
+        _recentActivities = new List<ActivityItem>
+        {
+            new() { Description = "DPS #123 criada com sucesso", Icon = Icons.Material.Filled.Add, Color = Color.Success, Timestamp = DateTime.Now.AddMinutes(-10) },
+            new() { Description = "XML validado com 1 aviso", Icon = Icons.Material.Filled.Warning, Color = Color.Warning, Timestamp = DateTime.Now.AddMinutes(-25) },
+            new() { Description = "Certificado A1 instalado", Icon = Icons.Material.Filled.Security, Color = Color.Info, Timestamp = DateTime.Now.AddHours(-2) },
+            new() { Description = "XML assinado digitalmente", Icon = Icons.Material.Filled.CheckCircle, Color = Color.Success, Timestamp = DateTime.Now.AddHours(-3) },
+            new() { Description = "Erro na validação do schema", Icon = Icons.Material.Filled.Error, Color = Color.Error, Timestamp = DateTime.Now.AddHours(-4) }
+        };
+    }
+
+    private class ActivityItem
+    {
+        public string Description { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public Color Color { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
+}

@@ -1,30 +1,80 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">PocIntegracaoNfse</a>
-    </div>
-</div>
+﻿<MudNavMenu>
+    <MudText Typo="Typo.h6" Class="px-4 py-2">Menu Principal</MudText>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+    <MudNavLink Href="/" Match="NavLinkMatch.All">
+        <MudIcon Icon="Icons.Material.Filled.Home" Class="mr-3" />
+        Dashboard
+    </MudNavLink>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+    <MudNavGroup Text="NFSe" Icon="Icons.Material.Filled.Description" Expanded="true">
+        <MudNavLink Href="/xml-editor">
+            <MudIcon Icon="Icons.Material.Filled.Edit" Class="mr-3" />
+            Editor XML
+        </MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
+        <MudNavLink Href="/xml-viewer">
+            <MudIcon Icon="Icons.Material.Filled.Visibility" Class="mr-3" />
+            Visualizar XML
+        </MudNavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+        <MudNavLink Href="/xml-validator">
+            <MudIcon Icon="Icons.Material.Filled.CheckCircle" Class="mr-3" />
+            Validar XML
+        </MudNavLink>
+    </MudNavGroup>
 
+    <MudNavGroup Text="DPS" Icon="Icons.Material.Filled.Assignment" Expanded="true">
+        <MudNavLink Href="/dps/novo">
+            <MudIcon Icon="Icons.Material.Filled.Add" Class="mr-3" />
+            Nova DPS
+        </MudNavLink>
+
+        <MudNavLink Href="/dps/lista">
+            <MudIcon Icon="Icons.Material.Filled.List" Class="mr-3" />
+            Listar DPS
+        </MudNavLink>
+
+        <MudNavLink Href="/dps/importar">
+            <MudIcon Icon="Icons.Material.Filled.Upload" Class="mr-3" />
+            Importar DPS
+        </MudNavLink>
+    </MudNavGroup>
+
+    <MudDivider Class="my-2" />
+
+    <MudNavGroup Text="Certificados" Icon="Icons.Material.Filled.Security">
+        <MudNavLink Href="/certificados">
+            <MudIcon Icon="Icons.Material.Filled.Certificate" Class="mr-3" />
+            Gerenciar
+        </MudNavLink>
+
+        <MudNavLink Href="/certificados/instalar">
+            <MudIcon Icon="Icons.Material.Filled.InstallDesktop" Class="mr-3" />
+            Instalar
+        </MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Text="Administração" Icon="Icons.Material.Filled.AdminPanelSettings">
+        <MudNavLink Href="/admin/dashboard">
+            <MudIcon Icon="Icons.Material.Filled.Dashboard" Class="mr-3" />
+            Dashboard
+        </MudNavLink>
+
+        <MudNavLink Href="/admin/logs">
+            <MudIcon Icon="Icons.Material.Filled.Article" Class="mr-3" />
+            Logs
+        </MudNavLink>
+
+        <MudNavLink Href="/admin/configuracoes">
+            <MudIcon Icon="Icons.Material.Filled.Settings" Class="mr-3" />
+            Configurações
+        </MudNavLink>
+    </MudNavGroup>
+
+    <MudDivider Class="my-2" />
+
+    <MudNavLink Href="/sobre">
+        <MudIcon Icon="Icons.Material.Filled.Info" Class="mr-3" />
+        Sobre
+    </MudNavLink>
+</MudNavMenu>

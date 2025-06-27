@@ -1,0 +1,275 @@
+﻿@page "/xml-editor"
+
+@using PocIntegracaoNfse.Services
+@inject XmlService XmlService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Editor XML - NFSe</PageTitle>
+
+<div class="fade-in">
+    <MudGrid>
+        <!-- Header -->
+        <MudItem xs="12">
+            <MudCard Class="mb-4">
+                <MudCardContent>
+                    <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <div>
+                            <MudText Typo="Typo.h4" Color="Color.Primary">
+                                Editor XML NFSe
+                            </MudText>
+                            <MudText Typo="Typo.body1" Color="Color.Secondary">
+                                Crie e edite documentos XML para o Sistema Nacional NFS-e
+                            </MudText>
+                        </div>
+                        <MudButtonGroup Variant="Variant.Outlined">
+                            <MudButton StartIcon="@Icons.Material.Filled.Save"
+                                       Color="Color.Primary"
+                                       OnClick="SaveXml">
+                                Salvar
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.CheckCircle"
+                                       Color="Color.Success"
+                                       OnClick="ValidateXml">
+                                Validar
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Visibility"
+                                       Color="Color.Info"
+                                       OnClick="PreviewXml">
+                                Visualizar
+                            </MudButton>
+                        </MudButtonGroup>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Tabs de Formulários -->
+        <MudItem xs="12">
+            <MudCard>
+                <MudTabs Elevation="4" Rounded="true" PanelClass="mud-height-full">
+
+                    <!-- Tab DPS -->
+                    <MudTabPanel Text="DPS" Icon="@Icons.Material.Filled.Assignment">
+                        <div class="pa-4">
+                            <MudText Typo="Typo.h6" Class="mb-4">Declaração de Prestação de Serviços</MudText>
+                            <!-- Aqui será inserido o DpsForm.razor -->
+                            <MudAlert Severity="Severity.Info" Class="mb-4">
+                                Formulário DPS será implementado na próxima fase
+                            </MudAlert>
+
+                            <!-- Seções temporárias para demonstração -->
+                            <MudExpansionPanels Elevation="4" Rounded="true">
+                                <MudExpansionPanel Text="Identificação" Icon="@Icons.Material.Filled.Badge">
+                                    <div class="form-section">
+                                        <MudGrid>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_dpsData.Serie"
+                                                              Label="Série"
+                                                              Variant="Variant.Outlined"
+                                                              FullWidth="true" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_dpsData.Numero"
+                                                              Label="Número"
+                                                              Variant="Variant.Outlined"
+                                                              FullWidth="true" />
+                                            </MudItem>
+                                        </MudGrid>
+                                    </div>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="Prestador" Icon="@Icons.Material.Filled.Business">
+                                    <div class="form-section">
+                                        <MudGrid>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_dpsData.PrestadorCnpj"
+                                                              Label="CNPJ do Prestador"
+                                                              Variant="Variant.Outlined"
+                                                              FullWidth="true" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_dpsData.PrestadorNome"
+                                                              Label="Nome/Razão Social"
+                                                              Variant="Variant.Outlined"
+                                                              FullWidth="true" />
+                                            </MudItem>
+                                        </MudGrid>
+                                    </div>
+                                </MudExpansionPanel>
+
+                                <MudExpansionPanel Text="Tomador" Icon="@Icons.Material.Filled.Person">
+                                    <div class="form-section">
+                                        <MudGrid>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_dpsData.TomadorCnpj"
+                                                              Label="CNPJ do Tomador"
+                                                              Variant="Variant.Outlined"
+                                                              FullWidth="true" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_dpsData.TomadorNome"
+                                                              Label="Nome/Razão Social"
+                                                              Variant="Variant.Outlined"
+                                                              FullWidth="true" />
+                                            </MudItem>
+                                        </MudGrid>
+                                    </div>
+                                </MudExpansionPanel>
+                            </MudExpansionPanels>
+                        </div>
+                    </MudTabPanel>
+
+                    <!-- Tab Serviços -->
+                    <MudTabPanel Text="Serviços" Icon="@Icons.Material.Filled.WorkOutline">
+                        <div class="pa-4">
+                            <MudText Typo="Typo.h6" Class="mb-4">Informações do Serviço</MudText>
+                            <MudAlert Severity="Severity.Info">
+                                Formulário de Serviços será implementado na próxima fase
+                            </MudAlert>
+                        </div>
+                    </MudTabPanel>
+
+                    <!-- Tab Valores -->
+                    <MudTabPanel Text="Valores" Icon="@Icons.Material.Filled.AttachMoney">
+                        <div class="pa-4">
+                            <MudText Typo="Typo.h6" Class="mb-4">Valores e Tributação</MudText>
+                            <MudAlert Severity="Severity.Info">
+                                Formulário de Valores será implementado na próxima fase
+                            </MudAlert>
+                        </div>
+                    </MudTabPanel>
+
+                    <!-- Tab XML Gerado -->
+                    <MudTabPanel Text="XML Gerado" Icon="@Icons.Material.Filled.Code">
+                        <div class="pa-4">
+                            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-4">
+                                <MudText Typo="Typo.h6">XML Gerado</MudText>
+                                <MudButtonGroup Size="Size.Small">
+                                    <MudButton StartIcon="@Icons.Material.Filled.ContentCopy"
+                                               OnClick="CopyXmlToClipboard">
+                                        Copiar
+                                    </MudButton>
+                                    <MudButton StartIcon="@Icons.Material.Filled.Download"
+                                               OnClick="DownloadXml">
+                                        Download
+                                    </MudButton>
+                                </MudButtonGroup>
+                            </MudStack>
+
+                            <MudPaper Class="xml-container" Elevation="2">
+                                <div class="xml-content">@_generatedXml</div>
+                            </MudPaper>
+                        </div>
+                    </MudTabPanel>
+                </MudTabs>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</div>
+
+<!-- FAB para ações rápidas -->
+<div class="fab-container">
+    <MudFab Color="Color.Primary"
+            StartIcon="@Icons.Material.Filled.Refresh"
+            OnClick="GenerateXml" />
+</div>
+
+@code {
+    private DpsFormData _dpsData = new();
+    private string _generatedXml = "<!-- XML será gerado automaticamente -->";
+    private bool _isLoading = false;
+
+    private async Task SaveXml()
+    {
+        // Implementar salvamento
+        await Task.Delay(500);
+        // Usar SnackBar via XmlService
+    }
+
+    private async Task ValidateXml()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            await XmlService.ValidateXmlAsync(_generatedXml);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task PreviewXml()
+    {
+        // Navegar para visualizador
+        await JSRuntime.InvokeVoidAsync("open", "/xml-viewer", "_blank");
+    }
+
+    private async Task GenerateXml()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            // Simular geração de XML
+            await Task.Delay(1000);
+            _generatedXml = GenerateSampleXml();
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CopyXmlToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _generatedXml);
+    }
+
+    private async Task DownloadXml()
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(_generatedXml);
+        var base64 = Convert.ToBase64String(bytes);
+        await JSRuntime.InvokeVoidAsync("downloadFileFromBase64", base64, "nfse.xml", "application/xml");
+    }
+
+    private string GenerateSampleXml()
+    {
+        return $@"<?xml version=""1.0"" encoding=""UTF-8""?>
+<DPS xmlns=""http://www.sped.fazenda.gov.br/nfse"" versao=""1.00"">
+  <infDPS Id=""DPS{DateTime.Now:yyyyMMddHHmmss}"">
+    <tpAmb>2</tpAmb>
+    <dhEmi>{DateTime.Now:yyyy-MM-ddTHH:mm:sszzz}</dhEmi>
+    <verAplic>1.00</verAplic>
+    <serie>{_dpsData.Serie}</serie>
+    <nDPS>{_dpsData.Numero}</nDPS>
+    <dCompet>{DateTime.Now:yyyy-MM-dd}</dCompet>
+    <tpEmit>1</tpEmit>
+    <cLocEmi>3542404</cLocEmi>
+    <prest>
+      <CNPJ>{_dpsData.PrestadorCnpj}</CNPJ>
+      <xNome>{_dpsData.PrestadorNome}</xNome>
+    </prest>
+    <toma>
+      <CNPJ>{_dpsData.TomadorCnpj}</CNPJ>
+      <xNome>{_dpsData.TomadorNome}</xNome>
+    </toma>
+  </infDPS>
+</DPS>";
+    }
+
+    private class DpsFormData
+    {
+        public string Serie { get; set; } = "00001";
+        public string Numero { get; set; } = "1";
+        public string PrestadorCnpj { get; set; } = "";
+        public string PrestadorNome { get; set; } = "";
+        public string TomadorCnpj { get; set; } = "";
+        public string TomadorNome { get; set; } = "";
+    }
+}

@@ -1,0 +1,162 @@
+﻿@page "/xml-viewer"
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Visualizador XML - NFSe</PageTitle>
+
+<div class="fade-in">
+    <MudGrid>
+        <!-- Header -->
+        <MudItem xs="12">
+            <MudCard Class="mb-4">
+                <MudCardContent>
+                    <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                        <div>
+                            <MudText Typo="Typo.h4" Color="Color.Primary">
+                                Visualizador XML
+                            </MudText>
+                            <MudText Typo="Typo.body1" Color="Color.Secondary">
+                                Compare e visualize XML original vs XML gerado
+                            </MudText>
+                        </div>
+                        <MudButtonGroup Variant="Variant.Outlined">
+                            <MudButton StartIcon="@Icons.Material.Filled.Upload">
+                                Carregar XML
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.CompareArrows">
+                                Comparar
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Download">
+                                Exportar
+                            </MudButton>
+                        </MudButtonGroup>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Split View -->
+        <MudItem xs="12" md="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">XML Original</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Fullscreen" Size="Size.Small" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent Class="pa-2">
+                    <MudPaper Class="xml-container" Elevation="0">
+                        <div class="xml-content">@_originalXml</div>
+                    </MudPaper>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">XML Assinado</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Size="Size.Small" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Fullscreen" Size="Size.Small" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent Class="pa-2">
+                    <MudPaper Class="xml-container" Elevation="0">
+                        <div class="xml-content">@_signedXml</div>
+                    </MudPaper>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Diff Viewer -->
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Diferenças Encontradas</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudAlert Severity="Severity.Info" Class="mb-4">
+                        Visualizador de diferenças será implementado na próxima fase
+                    </MudAlert>
+                    
+                    <MudSimpleTable Dense="true" Hover="true">
+                        <thead>
+                            <tr>
+                                <th>Linha</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Original</th>
+                                <th>Assinado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>15</td>
+                                <td><MudChip Size="Size.Small" Color="Color.Warning" T="string">Adição</MudChip></td>
+                                <td>Assinatura digital adicionada</td>
+                                <td>-</td>
+                                <td>&lt;ds:Signature&gt;...&lt;/ds:Signature&gt;</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td><MudChip Size="Size.Small" Color="Color.Info" T="string">Modificação</MudChip></td>
+                                <td>ID do documento atualizado</td>
+                                <td>Id="DPS001"</td>
+                                <td>Id="DPS20250620001"</td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    private string _originalXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<DPS xmlns=""http://www.sped.fazenda.gov.br/nfse"" versao=""1.00"">
+  <infDPS Id=""DPS001"">
+    <tpAmb>2</tpAmb>
+    <dhEmi>2025-06-20T10:30:00-03:00</dhEmi>
+    <verAplic>1.00</verAplic>
+    <serie>00001</serie>
+    <nDPS>1</nDPS>
+    <dCompet>2025-06-20</dCompet>
+    <tpEmit>1</tpEmit>
+    <cLocEmi>3542404</cLocEmi>
+  </infDPS>
+</DPS>";
+
+    private string _signedXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<DPS xmlns=""http://www.sped.fazenda.gov.br/nfse"" versao=""1.00"">
+  <infDPS Id=""DPS20250620001"">
+    <tpAmb>2</tpAmb>
+    <dhEmi>2025-06-20T10:30:00-03:00</dhEmi>
+    <verAplic>1.00</verAplic>
+    <serie>00001</serie>
+    <nDPS>1</nDPS>
+    <dCompet>2025-06-20</dCompet>
+    <tpEmit>1</tpEmit>
+    <cLocEmi>3542404</cLocEmi>
+  </infDPS>
+  <ds:Signature xmlns:ds=""http://www.w3.org/2000/09/xmldsig#"">
+    <!-- Assinatura digital será inserida aqui -->
+  </ds:Signature>
+</DPS>";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("highlightXml", "original-xml");
+            await JSRuntime.InvokeVoidAsync("highlightXml", "signed-xml");
+        }
+    }
+}
