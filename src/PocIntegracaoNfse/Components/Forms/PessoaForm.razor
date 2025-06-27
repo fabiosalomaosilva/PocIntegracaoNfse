@@ -6,18 +6,18 @@
     <!-- Tipo de Documento -->
     <MudItem xs="12">
         <MudRadioGroup @bind-SelectedOption="TipoDocumento" T="TipoDocumentoEnum">
-            <MudRadio Option="TipoDocumentoEnum.CNPJ" Color="Color.Primary">
+            <MudRadio Option="TipoDocumentoEnum.CNPJ" Color="Color.Primary" T="TipoDocumentoEnum">
                 Pessoa Jurídica (CNPJ)
             </MudRadio>
-            <MudRadio Option="TipoDocumentoEnum.CPF" Color="Color.Primary">
+            <MudRadio Option="TipoDocumentoEnum.CPF" Color="Color.Primary" T="TipoDocumentoEnum">
                 Pessoa Física (CPF)
             </MudRadio>
             @if (AllowNIF)
             {
-                <MudRadio Option="TipoDocumentoEnum.NIF" Color="Color.Primary">
+                <MudRadio Option="TipoDocumentoEnum.NIF" Color="Color.Primary" T="TipoDocumentoEnum">
                     Estrangeiro (NIF)
                 </MudRadio>
-                <MudRadio Option="TipoDocumentoEnum.SemNIF" Color="Color.Primary">
+                <MudRadio Option="TipoDocumentoEnum.SemNIF" Color="Color.Primary" T="TipoDocumentoEnum">
                     Sem NIF
                 </MudRadio>
             }
@@ -133,12 +133,14 @@
     }
 </MudGrid>
 
+@typeparam TPessoa where TPessoa : PessoaBaseModel
+
 @code {
     [Parameter]
-    public PessoaBaseModel Model { get; set; } = new TomadorModel();
+    public TPessoa Model { get; set; }
 
     [Parameter]
-    public EventCallback<PessoaBaseModel> ModelChanged { get; set; }
+    public EventCallback<TPessoa> ModelChanged { get; set; }
 
     [Parameter]
     public bool IsRequired { get; set; } = true;

@@ -1,5 +1,4 @@
-﻿@using PocIntegracaoNfse.Core.Models.Validation
-
+﻿
 <MudCard Class="@CssClass" Style="@Style">
     @if (!string.IsNullOrEmpty(Title))
     {
@@ -43,7 +42,7 @@
     <MudCardContent>
         @if (ValidationResult != null && ShowValidationSummary)
         {
-            <ValidationSummary Result="ValidationResult" Class="mb-4" />
+            <ValidationResume Result="ValidationResult" Class="mb-4" />
         }
 
         @if (IsLoading)
@@ -137,7 +136,7 @@
     public bool ShowValidationSummary { get; set; } = true;
 
     [Parameter]
-    public ValidationResult? ValidationResult { get; set; }
+    public PocIntegracaoNfse.Core.Models.Validation.ValidationResult? ValidationResult { get; set; }
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

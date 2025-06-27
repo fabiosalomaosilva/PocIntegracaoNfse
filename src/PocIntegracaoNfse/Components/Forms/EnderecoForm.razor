@@ -6,10 +6,10 @@
     <!-- Tipo de Endereço -->
     <MudItem xs="12">
         <MudRadioGroup @bind-SelectedOption="TipoEndereco" T="TipoEnderecoEnum">
-            <MudRadio Option="TipoEnderecoEnum.Nacional" Color="Color.Primary">
+            <MudRadio T="TipoEnderecoEnum" Option="TipoEnderecoEnum.Nacional" Color="Color.Primary">
                 Endereço Nacional
             </MudRadio>
-            <MudRadio Option="TipoEnderecoEnum.Exterior" Color="Color.Primary">
+            <MudRadio T="TipoEnderecoEnum" Option="TipoEnderecoEnum.Exterior" Color="Color.Primary">
                 Endereço no Exterior
             </MudRadio>
         </MudRadioGroup>
