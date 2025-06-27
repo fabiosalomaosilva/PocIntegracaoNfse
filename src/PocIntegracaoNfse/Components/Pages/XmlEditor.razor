@@ -9,6 +9,8 @@
 @inject XmlGeneratorService XmlGenerator
 @inject XmlValidationService XmlValidator
 @inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
 
 <PageTitle>Editor XML NFSe</PageTitle>
 
@@ -42,6 +44,8 @@
                         </MudChip>
                     }
                 </MudStack>
+
+                <!-- Botões de Ação -->
                 <MudButtonGroup Variant="Variant.Filled">
                     <MudButton StartIcon="@Icons.Material.Filled.Save"
                                Color="Color.Primary"
@@ -159,7 +163,7 @@
                 </MudCardContent>
             </MudCard>
 
-            <!-- Conteúdo Principal -->
+            <!-- Conteúdo Principal - Tabs -->
             <MudTabs Elevation="4"
                      Rounded="true"
                      PanelClass="mud-height-full"
@@ -172,7 +176,7 @@
                              Icon="@Icons.Material.Filled.Assignment"
                              ToolTip="Declaração de Prestação de Serviços"
                              BadgeData="@(SelectedDocumentType == "DPS" ? "●" : null)"
-                             BadgeColor="Color.Primary">
+                             BadgeColor="Color.Success">
                     <div class="pa-4">
                         @if (SelectedDocumentType == "DPS")
                         {
@@ -257,18 +261,19 @@
                                 <MudCard Elevation="2">
                                     <MudCardContent>
                                         <MudTextField @bind-Value="GeneratedXml"
-                                                      Label="XML Gerado"
                                                       Variant="Variant.Outlined"
                                                       Lines="20"
                                                       ReadOnly="true"
-                                                      Class="xml-display" />
+                                                      FullWidth="true"
+                                                      Class="xml-display"
+                                                      HelperText="XML gerado automaticamente" />
                                     </MudCardContent>
                                 </MudCard>
                             }
                             else
                             {
                                 <MudAlert Severity="Severity.Info">
-                                    <MudText>Preencha os dados do formulário e clique em "Gerar XML" para visualizar o resultado.</MudText>
+                                    <MudText>Preencha os dados nos formulários e clique em "Gerar XML" para visualizar o resultado.</MudText>
                                 </MudAlert>
                             }
                         </MudStack>
@@ -276,11 +281,9 @@
                 </MudTabPanel>
 
                 <!-- Tab Validação -->
-                <MudTabPanel Text="Validação" Icon="@Icons.Material.Filled.VerifiedUser">
+                <MudTabPanel Text="Validação" Icon="@Icons.Material.Filled.CheckCircle">
                     <div class="pa-4">
                         <MudStack Spacing="3">
-                            <MudText Typo="Typo.h6">Resultado da Validação</MudText>
-
                             @if (ValidationResult != null)
                             {
                                 <MudAlert Severity="@(ValidationResult.IsValid ? Severity.Success : Severity.Error)"
@@ -374,15 +377,123 @@
 
     protected override void OnInitialized()
     {
-        // Inicializar com dados padrão se necessário
         InitializeDefaultData();
     }
 
     private void InitializeDefaultData()
     {
-        // O DpsForm já inicializa seus próprios dados padrão
-        // Aqui podemos adicionar qualquer inicialização adicional se necessário
+        // Inicializar DPS com dados básicos
+        DpsModel.InfDPS.Serie = "001";
+        DpsModel.InfDPS.NDPS = "1";
+        DpsModel.InfDPS.TpAmb = TipoAmbiente.Homologacao;
+        DpsModel.InfDPS.DhEmi = DateTime.Now;
+        DpsModel.InfDPS.DCompet = DateOnly.FromDateTime(DateTime.Now);
+        DpsModel.InfDPS.VerAplic = "1.0.0";
+        DpsModel.InfDPS.TpEmit = EmitenteDPS.Prestador;
+        DpsModel.InfDPS.CLocEmi = "3304557"; // Rio de Janeiro como padrão
+
+        // Inicializar NFSe com dados básicos
+        NfseModel.InfNFSe.NNFSe = "1";
+        NfseModel.InfNFSe.Id = "ABC123";
+        NfseModel.InfNFSe.DhProc = DateTime.Now;
     }
+
+    private int GetActiveTabIndex()
+    {
+        return SelectedDocumentType switch
+        {
+            "DPS" => 0,
+            "NFSe" => 1,
+            _ => 0
+        };
+    }
+
+    #region Document Actions
+
+    private async Task SaveDocument()
+    {
+        IsLoading = true;
+        try
+        {
+            await GenerateXml();
+            Snackbar.Add($"{SelectedDocumentType} salvo com sucesso!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao salvar: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task ValidateDocument()
+    {
+        IsLoading = true;
+        try
+        {
+            if (string.IsNullOrEmpty(GeneratedXml))
+            {
+                await GenerateXml();
+            }
+
+            if (!string.IsNullOrEmpty(GeneratedXml))
+            {
+                ValidationResult = await XmlValidator.ValidateAsync(GeneratedXml);
+                var message = ValidationResult.IsValid
+                    ? "Documento validado com sucesso!"
+                    : $"Validação encontrou {ValidationResult.Errors.Count} erro(s)";
+
+                var severity = ValidationResult.IsValid ? Severity.Success : Severity.Warning;
+                Snackbar.Add(message, severity);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro na validação: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void ClearDocument()
+    {
+        GeneratedXml = string.Empty;
+        ValidationResult = null;
+        InitializeDefaultData();
+        Snackbar.Add("Documento limpo", Severity.Info);
+    }
+
+    private async Task GenerateXml()
+    {
+        IsLoading = true;
+        try
+        {
+            if (SelectedDocumentType == "DPS")
+            {
+                GeneratedXml = await XmlGenerator.GenerateXmlAsync(DpsModel);
+            }
+            else if (SelectedDocumentType == "NFSe")
+            {
+                GeneratedXml = await XmlGenerator.GenerateNfseXmlAsync(NfseModel);
+            }
+
+            Snackbar.Add($"XML {SelectedDocumentType} gerado com sucesso!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao gerar XML: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    #endregion
 
     #region DPS Event Handlers
 
@@ -391,10 +502,8 @@
         IsLoading = true;
         try
         {
-            // Gerar XML automaticamente ao salvar
+            DpsModel = model;
             await GenerateXml();
-
-            // Aqui você pode adicionar lógica para salvar em banco de dados, arquivo, etc.
             Snackbar.Add("DPS salvo com sucesso!", Severity.Success);
         }
         catch (Exception ex)
@@ -413,23 +522,22 @@
         IsLoading = true;
         try
         {
-            // Primeiro gerar o XML
+            DpsModel = model;
             var xml = await XmlGenerator.GenerateXmlAsync(model);
             GeneratedXml = xml;
 
-            // Depois validar
             ValidationResult = await XmlValidator.ValidateAsync(xml);
 
             var message = ValidationResult.IsValid
                 ? "DPS validado com sucesso!"
-                : $"Validação falhou: {ValidationResult.Errors.Count} erro(s) encontrado(s)";
+                : $"DPS possui {ValidationResult.Errors.Count} erro(s)";
 
-            var severity = ValidationResult.IsValid ? Severity.Success : Severity.Error;
+            var severity = ValidationResult.IsValid ? Severity.Success : Severity.Warning;
             Snackbar.Add(message, severity);
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Erro na validação: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Erro na validação DPS: {ex.Message}", Severity.Error);
         }
         finally
         {
@@ -438,76 +546,17 @@
         }
     }
 
-    private async Task HandleDpsClear()
+    private void HandleDpsClear()
     {
+        DpsModel = new DpsModel();
+        InitializeDefaultData();
         GeneratedXml = string.Empty;
         ValidationResult = null;
-        Snackbar.Add("Formulário limpo!", Severity.Info);
-        await Task.CompletedTask;
+        Snackbar.Add("DPS limpo", Severity.Info);
+        StateHasChanged();
     }
 
     #endregion
-
-    #region XML Actions
-
-    private async Task GenerateXml()
-    {
-        IsLoading = true;
-        try
-        {
-            string xml = string.Empty;
-
-            switch (SelectedDocumentType)
-            {
-                case "DPS":
-                    xml = await XmlGenerator.GenerateXmlAsync(DpsModel);
-                    break;
-                case "NFSe":
-                    xml = await XmlGenerator.GenerateNfseXmlAsync(NfseModel);
-                    break;
-                default:
-                    Snackbar.Add("Tipo de documento não selecionado", Severity.Warning);
-                    return;
-            }
-
-            GeneratedXml = xml;
-            Snackbar.Add($"XML {SelectedDocumentType} gerado com sucesso!", Severity.Success);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro ao gerar XML: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            IsLoading = false;
-            StateHasChanged();
-        }
-    }
-
-    #endregion
-
-    private async Task OpenXmlViewer()
-    {
-        if (string.IsNullOrEmpty(GeneratedXml))
-        {
-            Snackbar.Add("Nenhum XML gerado para visualizar", Severity.Warning);
-            return;
-        }
-
-        try
-        {
-            // TODO: Implementar navegação para página de visualização
-            // Por ora, mostrar o XML em um dialog
-            Snackbar.Add("Visualizador XML será implementado em breve", Severity.Info);
-            await Task.CompletedTask;
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro ao abrir visualizador: {ex.Message}", Severity.Error);
-        }
-    }
-
-
 
     #region NFSe Event Handlers
 
@@ -516,10 +565,8 @@
         IsLoading = true;
         try
         {
-            // Gerar XML automaticamente ao salvar
+            NfseModel = model;
             await GenerateXml();
-
-            // Aqui você pode adicionar lógica para salvar em banco de dados, arquivo, etc.
             Snackbar.Add("NFSe salvo com sucesso!", Severity.Success);
         }
         catch (Exception ex)
@@ -538,23 +585,22 @@
         IsLoading = true;
         try
         {
-            // Primeiro gerar o XML
+            NfseModel = model;
             var xml = await XmlGenerator.GenerateNfseXmlAsync(model);
             GeneratedXml = xml;
 
-            // Depois validar
             ValidationResult = await XmlValidator.ValidateAsync(xml);
 
             var message = ValidationResult.IsValid
                 ? "NFSe validado com sucesso!"
-                : $"Validação falhou: {ValidationResult.Errors.Count} erro(s) encontrado(s)";
+                : $"NFSe possui {ValidationResult.Errors.Count} erro(s)";
 
-            var severity = ValidationResult.IsValid ? Severity.Success : Severity.Error;
+            var severity = ValidationResult.IsValid ? Severity.Success : Severity.Warning;
             Snackbar.Add(message, severity);
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Erro na validação: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Erro na validação NFSe: {ex.Message}", Severity.Error);
         }
         finally
         {
@@ -563,243 +609,145 @@
         }
     }
 
-    private async Task HandleNfseClear()
+    private void HandleNfseClear()
     {
+        NfseModel = new NfseModel();
+        InitializeDefaultData();
         GeneratedXml = string.Empty;
         ValidationResult = null;
-        Snackbar.Add("Formulário NFSe limpo!", Severity.Info);
-        await Task.CompletedTask;
+        Snackbar.Add("NFSe limpo", Severity.Info);
+        StateHasChanged();
     }
 
     #endregion
 
-    #region Document Actions
+    #region Import/Export Actions
 
-    private async Task SaveDocument()
+    private void ImportXml()
     {
-        switch (SelectedDocumentType)
-        {
-            case "DPS":
-                await HandleDpsSave(DpsModel);
-                break;
-            case "NFSe":
-                await HandleNfseSave(NfseModel);
-                break;
-        }
-    }
-
-    private async Task ValidateDocument()
-    {
-        switch (SelectedDocumentType)
-        {
-            case "DPS":
-                await HandleDpsValidate(DpsModel);
-                break;
-            case "NFSe":
-                await HandleNfseValidate(NfseModel);
-                break;
-        }
-    }
-
-    private async Task ClearDocument()
-    {
-        switch (SelectedDocumentType)
-        {
-            case "DPS":
-                await HandleDpsClear();
-                break;
-            case "NFSe":
-                await HandleNfseClear();
-                break;
-        }
-    }
-
-    #endregion
-
-    #region XML Actions
-
-
-
-    private async Task DownloadXml()
-    {
-        if (string.IsNullOrEmpty(GeneratedXml))
-        {
-            Snackbar.Add("Nenhum XML para baixar. Gere o XML primeiro.", Severity.Warning);
-            return;
-        }
-
         try
         {
-            var fileName = $"{SelectedDocumentType}_{DateTime.Now:yyyyMMdd_HHmmss}.xml";
-            var bytes = System.Text.Encoding.UTF8.GetBytes(GeneratedXml);
-            var base64 = Convert.ToBase64String(bytes);
-            var dataUrl = $"data:application/xml;base64,{base64}";
-
-            // Usar JavaScript para baixar o arquivo
-            await Task.Run(() =>
-            {
-                // Aqui você pode implementar o download usando IJSRuntime se necessário
-                // Por ora, apenas mostrar mensagem de sucesso
-            });
-
-            Snackbar.Add($"Arquivo {fileName} preparado para download!", Severity.Success);
+            // TODO: Implementar importação de arquivo
+            Snackbar.Add("Funcionalidade de importação em desenvolvimento", Severity.Info);
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Erro ao preparar download: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Erro ao importar: {ex.Message}", Severity.Error);
         }
     }
 
-    private async Task CopyXmlToClipboard()
+    private void LoadSample()
     {
-        if (string.IsNullOrEmpty(GeneratedXml))
-        {
-            Snackbar.Add("Nenhum XML para copiar. Gere o XML primeiro.", Severity.Warning);
-            return;
-        }
-
         try
         {
-            // Aqui você pode implementar a cópia para clipboard usando IJSRuntime
-            // Por ora, apenas mostrar mensagem
-            Snackbar.Add($"XML {SelectedDocumentType} copiado para a área de transferência!", Severity.Success);
-            await Task.CompletedTask;
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro ao copiar XML: {ex.Message}", Severity.Error);
-        }
-    }
-
-    #endregion
-
-    #region Import and Sample Actions
-
-    private async Task ImportXml()
-    {
-        // TODO: Implementar importação de arquivo XML
-        // Por ora, mostrar placeholder
-        Snackbar.Add("Funcionalidade de importação será implementada em breve", Severity.Info);
-        await Task.CompletedTask;
-    }
-
-    private async Task LoadSample()
-    {
-        IsLoading = true;
-        try
-        {
-            switch (SelectedDocumentType)
+            if (SelectedDocumentType == "DPS")
             {
-                case "DPS":
-                    LoadSampleDps();
-                    Snackbar.Add("Dados de exemplo DPS carregados!", Severity.Success);
-                    break;
-                case "NFSe":
-                    LoadSampleNfse();
-                    Snackbar.Add("Dados de exemplo NFSe carregados!", Severity.Success);
-                    break;
+                // Carregar dados de exemplo para DPS
+                DpsModel.InfDPS.Serie = "001";
+                DpsModel.InfDPS.NDPS = "123";
+                DpsModel.InfDPS.TpAmb = TipoAmbiente.Homologacao;
+                DpsModel.InfDPS.DhEmi = DateTime.Now;
+                DpsModel.InfDPS.DCompet = DateOnly.FromDateTime(DateTime.Now);
+                DpsModel.InfDPS.VerAplic = "1.0.0";
+                DpsModel.InfDPS.TpEmit = EmitenteDPS.Prestador;
+                DpsModel.InfDPS.CLocEmi = "3304557";
+
+                // Dados do prestador de exemplo
+                DpsModel.InfDPS.Prest.CNPJ = "12.345.678/0001-90";
+                DpsModel.InfDPS.Prest.XNome = "Empresa de Exemplo LTDA";
+
+                // Dados do serviço de exemplo
+                DpsModel.InfDPS.Serv.LocPrest.CLocPrestacao = "123456";
+                DpsModel.InfDPS.Serv.CServ.XDescServ = "Serviços de consultoria em tecnologia da informação";
+                DpsModel.InfDPS.Serv.CServ.CTribNac = "3304557";
+
+                // Valores de exemplo
+                DpsModel.InfDPS.Valores.VServPrest.VServ = 1000.00m;
+                DpsModel.InfDPS.Valores.Trib.TribMun.PAliq = 2.00m;
             }
+            else
+            {
+                // Carregar dados de exemplo para NFSe
+                NfseModel.InfNFSe.NNFSe = "456";
+                NfseModel.InfNFSe.NDFSe = "XYZ789";
+                NfseModel.InfNFSe.DhProc = DateTime.Now;
+            }
+
+            Snackbar.Add($"Dados de exemplo carregados para {SelectedDocumentType}", Severity.Success);
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Erro ao carregar exemplo: {ex.Message}", Severity.Error);
         }
-        finally
+    }
+
+    private async Task OpenXmlViewer()
+    {
+        try
         {
-            IsLoading = false;
-            StateHasChanged();
+            Snackbar.Add("Redirecionando para visualizador...", Severity.Info);
+            await JSRuntime.InvokeVoidAsync("open", "/xml-viewer", "_blank");
         }
-        await Task.CompletedTask;
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao abrir visualizador: {ex.Message}", Severity.Error);
+        }
     }
 
-    private void LoadSampleDps()
+    private async Task DownloadXml()
     {
-        DpsModel = new DpsModel
+        try
+        {
+            if (!string.IsNullOrEmpty(GeneratedXml))
             {
-                InfDPS = new InfDpsModel
-                {
-                    Id = $"DPS{DateTime.Now:yyyyMMddHHmmss}",
-                    TpAmb = Models.Enums.TipoAmbiente.Homologacao,
-                    DhEmi = DateTime.Now,
-                    VerAplic = "1.00",
-                    Serie = "00001",
-                    NDPS = "123",
-                    DCompet = DateOnly.FromDateTime(DateTime.Now),
-                    TpEmit = Models.Enums.EmitenteDPS.Prestador,
-                    CLocEmi = "3542404"
-                }
-            };
+                var fileName = $"{SelectedDocumentType}_{DateTime.Now:yyyyMMdd_HHmmss}.xml";
+                await JSRuntime.InvokeVoidAsync("downloadFile", fileName, GeneratedXml, "application/xml");
+                Snackbar.Add("Download iniciado", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro no download: {ex.Message}", Severity.Error);
+        }
     }
 
-    private void LoadSampleNfse()
+    private async Task CopyXmlToClipboard()
     {
-        NfseModel = new NfseModel
+        try
+        {
+            if (!string.IsNullOrEmpty(GeneratedXml))
             {
-                InfNFSe = new InfNfseModel
-                {
-                    Id = $"NFS{DateTime.Now:yyyyMMddHHmmss}",
-                    XLocEmi = "Regente Feijó",
-                    XLocPrestacao = "Regente Feijó",
-                    NNFSe = "1",
-                    VerAplic = "1.00",
-                    AmbGer = Models.Enums.AmbienteGeradorNFSe.SistemaNacional,
-                    TpEmis = Models.Enums.TipoEmissao.EmissaoNormalNacional,
-                    ProcEmi = ProcessoEmissao.AplicativoContribuinte,
-                    CStat = 100,
-                    DhProc = DateTime.Now,
-                    NDFSe = "1",
-                    Emit = new EmitenteNfseModel
-                    {
-                        CNPJ = "12345678000190",
-                        IM = "4292",
-                        XNome = "Empresa de Teste 01",
-                        XFant = "Empresa Teste",
-                        EnderNac = new EnderecoEmitenteModel
-                        {
-                            XLgr = "AV. ATILIO ALBERTINI",
-                            Nro = "123",
-                            XBairro = "DISTRITO INDUSTRIAL",
-                            CMun = "3542404",
-                            UF = Models.Enums.UnidadeFederacao.SP,
-                            CEP = "19570000"
-                        },
-                        Fone = "1832296800",
-                        Email = "teste@teste.com.br"
-                    },
-                    Valores = new ValoresNfseModel
-                    {
-                        VLiq = 1623.03m,
-                        VBC = 1623.03m,
-                        PAliqAplic = 3.00m,
-                        VISSQN = 48.69m
-                    }
-                }
-            };
+                await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", GeneratedXml);
+                Snackbar.Add("XML copiado para a área de transferência", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao copiar: {ex.Message}", Severity.Error);
+        }
     }
 
     #endregion
 
-    private int GetActiveTabIndex()
-    {
-        return SelectedDocumentType switch
-        {
-            "DPS" => 0,
-            "NFSe" => 1,
-            _ => 2 // XML Gerado como padrão
-        };
-    }
+    #region Helper Methods
 
     private string GetValidationSummary()
     {
-        if (ValidationResult == null)
-            return string.Empty;
+        if (ValidationResult == null) return "";
 
-        if (ValidationResult.IsValid && !ValidationResult.Warnings.Any())
-            return "Documento está em conformidade com as regras de validação.";
+        var summary = new List<string>();
 
-        if (ValidationResult.IsValid && ValidationResult.Warnings.Any())
-            return $"Documento válido com {ValidationResult.Warnings.Count} aviso(s) de compatibilidade.";
+        if (ValidationResult.IsValid)
+            summary.Add("Documento está em conformidade com os schemas XSD");
 
-        return $"Foram encontrados {ValidationResult.Errors.Count} erro(s) que impedem o processamento do documento.";
+        if (ValidationResult.Errors.Any())
+            summary.Add($"{ValidationResult.Errors.Count} erro(s) encontrado(s)");
+
+        if (ValidationResult.Warnings.Any())
+            summary.Add($"{ValidationResult.Warnings.Count} aviso(s) encontrado(s)");
+
+        return string.Join(". ", summary);
     }
+
+    #endregion
 }

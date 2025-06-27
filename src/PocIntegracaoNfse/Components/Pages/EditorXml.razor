@@ -1,0 +1,443 @@
+@page "/editor"
+@using PocIntegracaoNfse.Models.DPS
+@using PocIntegracaoNfse.Models.NFSe
+@using PocIntegracaoNfse.Core.Services
+@using PocIntegracaoNfse.Core.Models.Validation
+@using PocIntegracaoNfse.Components.Forms
+@using MudBlazor
+@using PocIntegracaoNfse.Models.Enums
+@inject XmlGeneratorService XmlGenerator
+@inject XmlValidationService XmlValidator
+@inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<PageTitle>Editor de XML - NFSe/DPS</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudPaper Elevation="2" Class="pa-6">
+        <MudStack Spacing="4">
+            <!-- Cabeçalho -->
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h4">Editor de XML - NFSe/DPS</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">
+                        Crie e edite documentos DPS e NFSe
+                    </MudText>
+                </MudStack>
+
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudButton StartIcon="@Icons.Material.Filled.CheckCircle"
+                               Color="Color.Success"
+                               OnClick="ValidarDocumento"
+                               Disabled="IsCarregando">
+                        Validar
+                    </MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Build"
+                               Color="Color.Primary"
+                               OnClick="GerarXml"
+                               Disabled="IsCarregando">
+                        Gerar XML
+                    </MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Refresh"
+                               Color="Color.Secondary"
+                               OnClick="LimparDocumento"
+                               Disabled="IsCarregando">
+                        Limpar
+                    </MudButton>
+                </MudButtonGroup>
+            </MudStack>
+
+            <!-- Indicadores de Status -->
+            @if (ResultadoValidacao != null || !string.IsNullOrEmpty(XmlGerado))
+            {
+                <MudCard Elevation="1">
+                    <MudCardContent Class="py-2">
+                        <MudStack Row Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+                            @if (!string.IsNullOrEmpty(XmlGerado))
+                            {
+                                <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Filled.Code" Color="Color.Primary" />
+                                    <MudText Typo="Typo.caption">Documento</MudText>
+                                    <MudText Typo="Typo.body2">@TipoDocumentoSelecionado</MudText>
+                                </MudStack>
+                            }
+
+                            @if (ResultadoValidacao != null)
+                            {
+                                <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudIcon Icon="@(ResultadoValidacao.IsValid ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Error)"
+                                             Color="@(ResultadoValidacao.IsValid ? Color.Success : Color.Error)" />
+                                    <MudText Typo="Typo.caption">Status</MudText>
+                                    <MudText Typo="Typo.body2">@(ResultadoValidacao.IsValid ? "Válido" : "Inválido")</MudText>
+                                </MudStack>
+                            }
+                        </MudStack>
+                    </MudCardContent>
+                </MudCard>
+            }
+
+            <!-- Seleção do Tipo de Documento -->
+            <MudCard Elevation="1">
+                <MudCardContent>
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="4">
+                        <MudText Typo="Typo.h6">Tipo de Documento:</MudText>
+                        <MudRadioGroup @bind-SelectedOption="TipoDocumentoSelecionado" T="string">
+                            <MudRadio Option="@("DPS")" T="string">
+                                <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                                    <MudIcon Icon="@Icons.Material.Filled.Assignment" Color="Color.Primary" />
+                                    <MudText>DPS</MudText>
+                                </MudStack>
+                            </MudRadio>
+                            <MudRadio Option="@("NFSe")" T="string">
+                                <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                                    <MudIcon Icon="@Icons.Material.Filled.Receipt" Color="Color.Success" />
+                                    <MudText>NFSe</MudText>
+                                </MudStack>
+                            </MudRadio>
+                        </MudRadioGroup>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+
+            <!-- Conteúdo Principal -->
+            <MudTabs Elevation="2" Rounded="true" Color="Color.Primary" PanelClass="pa-4">
+                
+                <!-- Tab DPS -->
+                <MudTabPanel Text="DPS" Icon="@Icons.Material.Filled.Assignment">
+                    @if (TipoDocumentoSelecionado == "DPS")
+                    {
+                        <DpsForm @bind-Model="ModeloDps"
+                                 IsLoading="IsCarregando"
+                                 ValidationResult="ResultadoValidacao"
+                                 OnSave="SalvarDps"
+                                 OnValidate="ValidarDps"
+                                 OnClear="LimparDps" />
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info">
+                            Selecione "DPS" para editar este tipo de documento.
+                        </MudAlert>
+                    }
+                </MudTabPanel>
+
+                <!-- Tab NFSe -->
+                <MudTabPanel Text="NFSe" Icon="@Icons.Material.Filled.Receipt">
+                    @if (TipoDocumentoSelecionado == "NFSe")
+                    {
+                        <NfseForm @bind-Model="ModeloNfse"
+                                  IsLoading="IsCarregando"
+                                  ValidationResult="ResultadoValidacao"
+                                  OnSave="SalvarNfse"
+                                  OnValidate="ValidarNfse"
+                                  OnClear="LimparNfse" />
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Info">
+                            Selecione "NFSe" para editar este tipo de documento.
+                        </MudAlert>
+                    }
+                </MudTabPanel>
+
+                <!-- Tab XML -->
+                <MudTabPanel Text="XML Gerado" Icon="@Icons.Material.Filled.Code">
+                    <MudStack Spacing="3">
+                        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                            <MudText Typo="Typo.h6">XML Gerado</MudText>
+                            <MudButtonGroup Variant="Variant.Outlined" Size="Size.Small">
+                                <MudButton StartIcon="@Icons.Material.Filled.Download"
+                                           OnClick="BaixarXml"
+                                           Disabled="string.IsNullOrEmpty(XmlGerado)">
+                                    Download
+                                </MudButton>
+                                <MudButton StartIcon="@Icons.Material.Filled.ContentCopy"
+                                           OnClick="CopiarXml"
+                                           Disabled="string.IsNullOrEmpty(XmlGerado)">
+                                    Copiar
+                                </MudButton>
+                            </MudButtonGroup>
+                        </MudStack>
+
+                        @if (IsCarregando)
+                        {
+                            <MudProgressLinear Indeterminate="true" />
+                        }
+                        else if (!string.IsNullOrEmpty(XmlGerado))
+                        {
+                            <MudCard Elevation="2">
+                                <MudCardContent>
+                                    <MudTextField @bind-Value="XmlGerado"
+                                                  Variant="Variant.Outlined"
+                                                  Lines="20"
+                                                  ReadOnly="true"
+                                                  FullWidth="true"
+                                                  Class="xml-viewer"
+                                                  HelperText="XML gerado automaticamente" />
+                                </MudCardContent>
+                            </MudCard>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info">
+                                Preencha os dados e clique em "Gerar XML" para visualizar o resultado.
+                            </MudAlert>
+                        }
+                    </MudStack>
+                </MudTabPanel>
+
+                <!-- Tab Validação -->
+                <MudTabPanel Text="Validação" Icon="@Icons.Material.Filled.CheckCircle">
+                    <MudStack Spacing="3">
+                        @if (ResultadoValidacao != null)
+                        {
+                            <MudAlert Severity="@(ResultadoValidacao.IsValid ? Severity.Success : Severity.Error)">
+                                <MudText Typo="Typo.h6">
+                                    @(ResultadoValidacao.IsValid ? "✓ Documento Válido" : "✗ Documento Inválido")
+                                </MudText>
+                            </MudAlert>
+
+                            @if (ResultadoValidacao.Errors.Any())
+                            {
+                                <MudExpansionPanels Elevation="2">
+                                    <MudExpansionPanel Text="@($"Erros ({ResultadoValidacao.Errors.Count})")"
+                                                       Icon="@Icons.Material.Filled.Error"
+                                                       IsExpanded="true">
+                                        <MudList T="string">
+                                            @foreach (var erro in ResultadoValidacao.Errors)
+                                            {
+                                                <MudListItem Icon="@Icons.Material.Filled.Error" IconColor="Color.Error" T="string">
+                                                    <MudText>@erro</MudText>
+                                                </MudListItem>
+                                            }
+                                        </MudList>
+                                    </MudExpansionPanel>
+                                </MudExpansionPanels>
+                            }
+
+                            @if (ResultadoValidacao.Warnings.Any())
+                            {
+                                <MudExpansionPanels Elevation="2">
+                                    <MudExpansionPanel Text="@($"Avisos ({ResultadoValidacao.Warnings.Count})")"
+                                                       Icon="@Icons.Material.Filled.Warning">
+                                        <MudList T="string">
+                                            @foreach (var aviso in ResultadoValidacao.Warnings)
+                                            {
+                                                <MudListItem Icon="@Icons.Material.Filled.Warning" IconColor="Color.Warning" T="string">
+                                                    <MudText>@aviso</MudText>
+                                                </MudListItem>
+                                            }
+                                        </MudList>
+                                    </MudExpansionPanel>
+                                </MudExpansionPanels>
+                            }
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info">
+                                Clique em "Validar" para verificar a conformidade do documento.
+                            </MudAlert>
+                        }
+                    </MudStack>
+                </MudTabPanel>
+            </MudTabs>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+<style>
+    .xml-viewer .mud-input-control-input-container textarea {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+</style>
+
+@code {
+    private string TipoDocumentoSelecionado { get; set; } = "DPS";
+    private bool IsCarregando { get; set; }
+    private string XmlGerado { get; set; } = string.Empty;
+    private ValidationResult? ResultadoValidacao { get; set; }
+
+    // Models
+    private DpsModel ModeloDps { get; set; } = new();
+    private NfseModel ModeloNfse { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        InicializarDadosExemplo();
+    }
+
+    private void InicializarDadosExemplo()
+    {
+        // DPS exemplo
+        ModeloDps.InfDPS.Serie = "001";
+        ModeloDps.InfDPS.NDPS = "1";
+        ModeloDps.InfDPS.TpAmb = TipoAmbiente.Homologacao;
+        ModeloDps.InfDPS.DhEmi = DateTime.Now;
+        ModeloDps.InfDPS.DCompet = DateOnly.FromDateTime(DateTime.Now);
+        ModeloDps.InfDPS.VerAplic = "1.0.0";
+        ModeloDps.InfDPS.TpEmit = EmitenteDPS.Prestador;
+        ModeloDps.InfDPS.CLocEmi = "3304557";
+
+        // NFSe exemplo
+        ModeloNfse.InfNFSe.NNFSe = "1";
+        ModeloNfse.InfNFSe.Id = "NFSe_001";
+        ModeloNfse.InfNFSe.DhProc = DateTime.Now;
+    }
+
+    #region Ações Principais
+
+    private async Task GerarXml()
+    {
+        IsCarregando = true;
+        try
+        {
+            if (TipoDocumentoSelecionado == "DPS")
+            {
+                XmlGerado = await XmlGenerator.GenerateXmlAsync(ModeloDps);
+            }
+            else if (TipoDocumentoSelecionado == "NFSe")
+            {
+                XmlGerado = await XmlGenerator.GenerateNfseXmlAsync(ModeloNfse);
+            }
+
+            Snackbar.Add($"XML {TipoDocumentoSelecionado} gerado com sucesso!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao gerar XML: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsCarregando = false;
+        }
+    }
+
+    private async Task ValidarDocumento()
+    {
+        IsCarregando = true;
+        try
+        {
+            if (string.IsNullOrEmpty(XmlGerado))
+            {
+                await GerarXml();
+            }
+
+            if (!string.IsNullOrEmpty(XmlGerado))
+            {
+                ResultadoValidacao = await XmlValidator.ValidateAsync(XmlGerado);
+                var mensagem = ResultadoValidacao.IsValid
+                    ? "Documento validado com sucesso!"
+                    : $"Validação encontrou {ResultadoValidacao.Errors.Count} erro(s)";
+
+                var severity = ResultadoValidacao.IsValid ? Severity.Success : Severity.Warning;
+                Snackbar.Add(mensagem, severity);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro na validação: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsCarregando = false;
+        }
+    }
+
+    private void LimparDocumento()
+    {
+        XmlGerado = string.Empty;
+        ResultadoValidacao = null;
+        InicializarDadosExemplo();
+        Snackbar.Add("Documento limpo", Severity.Info);
+    }
+
+    #endregion
+
+    #region Eventos DPS
+
+    private async Task SalvarDps(DpsModel model)
+    {
+        ModeloDps = model;
+        await GerarXml();
+        Snackbar.Add("DPS salvo!", Severity.Success);
+    }
+
+    private async Task ValidarDps(DpsModel model)
+    {
+        ModeloDps = model;
+        await ValidarDocumento();
+    }
+
+    private void LimparDps()
+    {
+        ModeloDps = new DpsModel();
+        InicializarDadosExemplo();
+        LimparDocumento();
+    }
+
+    #endregion
+
+    #region Eventos NFSe
+
+    private async Task SalvarNfse(NfseModel model)
+    {
+        ModeloNfse = model;
+        await GerarXml();
+        Snackbar.Add("NFSe salvo!", Severity.Success);
+    }
+
+    private async Task ValidarNfse(NfseModel model)
+    {
+        ModeloNfse = model;
+        await ValidarDocumento();
+    }
+
+    private void LimparNfse()
+    {
+        ModeloNfse = new NfseModel();
+        InicializarDadosExemplo();
+        LimparDocumento();
+    }
+
+    #endregion
+
+    #region Utilitários
+
+    private async Task BaixarXml()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(XmlGerado))
+            {
+                var nomeArquivo = $"{TipoDocumentoSelecionado}_{DateTime.Now:yyyyMMdd_HHmmss}.xml";
+                await JSRuntime.InvokeVoidAsync("downloadFile", nomeArquivo, XmlGerado, "application/xml");
+                Snackbar.Add("Download iniciado", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro no download: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task CopiarXml()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(XmlGerado))
+            {
+                await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", XmlGerado);
+                Snackbar.Add("XML copiado!", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro ao copiar: {ex.Message}", Severity.Error);
+        }
+    }
+
+    #endregion
+}

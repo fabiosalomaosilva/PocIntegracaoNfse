@@ -12,6 +12,77 @@ public partial class XmlGeneratorService
     private const string Namespace = "http://www.sped.fazenda.gov.br/nfse";
 
     /// <summary>
+    /// Gera XML a partir de um model DPS
+    /// </summary>
+    public async Task<string> GenerateXmlAsync(DpsModel dps)
+    {
+        await Task.Delay(100); // Simular processamento assíncrono
+
+        try
+        {
+            var doc = new XDocument(
+                new XDeclaration("1.0", "UTF-8", null),
+                await CreateDpsRootElementAsync(dps)
+            );
+
+            return doc.ToString();
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao gerar XML DPS: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Cria o elemento raiz DPS
+    /// </summary>
+    private async Task<XElement> CreateDpsRootElementAsync(DpsModel dps)
+    {
+        var dpsElement = new XElement(GetXName("DPS"),
+            new XAttribute("versao", dps.Versao),
+            new XAttribute(XNamespace.Xmlns + "xmlns", Namespace)
+        );
+
+        if (dps.InfDPS != null)
+        {
+            dpsElement.Add(await CreateInfDpsElementAsync(dps.InfDPS));
+        }
+
+        // TODO: Adicionar assinatura digital quando implementada
+        // if (dps.Signature != null)
+        // {
+        //     dpsElement.Add(CreateSignatureElement(dps.Signature));
+        // }
+
+        return dpsElement;
+    }
+
+    /// <summary>
+    /// Cria o elemento infDPS
+    /// </summary>
+    private async Task<XElement> CreateInfDpsElementAsync(InfDpsModel infDps)
+    {
+        await Task.Delay(10); // Simular processamento assíncrono
+
+        var element = new XElement(GetXName("infDPS"),
+            new XAttribute("Id", infDps.Id ?? "DPS_" + infDps.NDPS),
+            new XElement(GetXName("serie"), infDps.Serie),
+            new XElement(GetXName("nDPS"), infDps.NDPS),
+            new XElement(GetXName("tpAmb"), (int)infDps.TpAmb),
+            new XElement(GetXName("dhEmi"), FormatDateTime(infDps.DhEmi)),
+            new XElement(GetXName("dCompet"), FormatDate(infDps.DCompet)),
+            new XElement(GetXName("verAplic"), infDps.VerAplic),
+            new XElement(GetXName("tpEmit"), (int)infDps.TpEmit),
+            new XElement(GetXName("cLocEmi"), infDps.CLocEmi)
+        );
+
+        // Adicionar outros elementos conforme necessário
+        // Esta é uma implementação básica que pode ser expandida
+
+        return element;
+    }
+
+    /// <summary>
     /// Gera XML a partir de um model NFSe
     /// </summary>
     public async Task<string> GenerateNfseXmlAsync(NfseModel nfse)
@@ -22,7 +93,7 @@ public partial class XmlGeneratorService
         {
             var doc = new XDocument(
                 new XDeclaration("1.0", "UTF-8", null),
-                CreateNfseElement(nfse)
+                await CreateNfseElement(nfse)
             );
 
             return doc.ToString();
