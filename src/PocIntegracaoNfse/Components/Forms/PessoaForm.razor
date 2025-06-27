@@ -33,34 +33,37 @@
                               Label="CNPJ"
                               Placeholder="00.000.000/0000-00"
                               Variant="Variant.Outlined"
-                              
-                              OnBlur="@(async () => await OnCNPJChange(Model.CNPJ))"
+                              FullWidth="true"
+                              OnBlur="@(() => OnCNPJChange(Model.CNPJ))"
                               Validation="@(new Func<string, string?>(ValidateCNPJ))"
                               Immediate="true" />
                 break;
+                
             case TipoDocumentoEnum.CPF:
                 <MudTextField @bind-Value="Model.CPF"
                               Label="CPF"
                               Placeholder="000.000.000-00"
                               Variant="Variant.Outlined"
-                              
-                              OnBlur="@(async () => await OnCPFChange(Model.CPF))"
+                              FullWidth="true"
+                              OnBlur="@(() => OnCPFChange(Model.CPF))"
                               Validation="@(new Func<string, string?>(ValidateCPF))"
                               Immediate="true" />
                 break;
+                
             case TipoDocumentoEnum.NIF:
                 <MudTextField @bind-Value="Model.NIF"
                               Label="NIF"
                               Placeholder="Número de Identificação Fiscal"
                               Variant="Variant.Outlined"
-                              
+                              FullWidth="true"
                               MaxLength="40" />
                 break;
+                
             case TipoDocumentoEnum.SemNIF:
                 <MudSelect @bind-Value="Model.CNaoNIF"
                            Label="Motivo para não informar NIF"
                            Variant="Variant.Outlined"
-                           >
+                           FullWidth="true">
                     <MudSelectItem Value="MotivoNaoNIF.DispensadoNIF">Dispensado do NIF</MudSelectItem>
                     <MudSelectItem Value="MotivoNaoNIF.NaoExigenciaNIF">Não exigência do NIF</MudSelectItem>
                 </MudSelect>
@@ -76,7 +79,7 @@
                           Label="CAEPF"
                           Placeholder="Cadastro de Atividade Econômica da Pessoa Física"
                           Variant="Variant.Outlined"
-                          
+                          FullWidth="true"
                           Validation="@(new Func<string, string?>(ValidateCAEPF))" />
         </MudItem>
     }
@@ -87,7 +90,7 @@
                       Label="Inscrição Municipal"
                       Placeholder="Número da inscrição municipal"
                       Variant="Variant.Outlined"
-                      
+                      FullWidth="true"
                       MaxLength="15" />
     </MudItem>
 
@@ -97,7 +100,7 @@
                       Label="@(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Razão Social" : "Nome Completo")"
                       Placeholder="@(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Nome empresarial" : "Nome da pessoa física")"
                       Variant="Variant.Outlined"
-                      
+                      FullWidth="true"
                       Required="@IsRequired"
                       MaxLength="300"
                       Validation="@(new Func<string, string?>(ValidateName))" />
@@ -109,15 +112,16 @@
                       Label="Telefone"
                       Placeholder="(11) 99999-9999"
                       Variant="Variant.Outlined"
-                      
+                      FullWidth="true"
                       Validation="@(new Func<string, string?>(ValidatePhone))" />
     </MudItem>
+
     <MudItem xs="12" md="6">
         <MudTextField @bind-Value="Model.Email"
                       Label="E-mail"
                       Placeholder="contato@empresa.com.br"
                       Variant="Variant.Outlined"
-                      
+                      FullWidth="true"
                       InputType="InputType.Email"
                       Validation="@(new Func<string, string?>(ValidateEmail))" />
     </MudItem>
@@ -128,7 +132,8 @@
         <MudItem xs="12">
             <MudDivider Class="my-4" />
             <MudText Typo="Typo.h6" Class="mb-4">Endereço</MudText>
-            <EnderecoForm @bind-Model="Model.End" IsRequired="@EnderecoObrigatorio" />
+            <EnderecoForm @bind-Model="Model.End" 
+                          IsRequired="@EnderecoObrigatorio" />
         </MudItem>
     }
 </MudGrid>
@@ -139,23 +144,14 @@
     [Parameter]
     public TPessoa Model { get; set; }
 
-    [Parameter]
+    [Parameter] 
     public EventCallback<TPessoa> ModelChanged { get; set; }
-
-    [Parameter]
-    public bool IsRequired { get; set; } = true;
-
-    [Parameter]
-    public bool AllowNIF { get; set; } = true;
-
-    [Parameter]
-    public bool ShowEndereco { get; set; } = true;
-
-    [Parameter]
-    public bool EnderecoObrigatorio { get; set; } = false;
-
-    [Parameter]
-    public string PessoaTipo { get; set; } = "pessoa";
+    
+    [Parameter] public bool IsRequired { get; set; } = true;
+    [Parameter] public bool AllowNIF { get; set; } = true;
+    [Parameter] public bool ShowEndereco { get; set; } = true;
+    [Parameter] public bool EnderecoObrigatorio { get; set; } = false;
+    [Parameter] public string PessoaTipo { get; set; } = "pessoa";
 
     private TipoDocumentoEnum _tipoDocumento = TipoDocumentoEnum.CNPJ;
 
@@ -234,63 +230,64 @@
     // Validações
     private string? ValidateCNPJ(string cnpj)
     {
-        if (TipoDocumento != TipoDocumentoEnum.CNPJ)
-            return null;
-        if (string.IsNullOrWhiteSpace(cnpj) && IsRequired)
-            return "CNPJ é obrigatório";
+        if (TipoDocumento != TipoDocumentoEnum.CNPJ) return null;
+        if (string.IsNullOrWhiteSpace(cnpj) && IsRequired) return "CNPJ é obrigatório";
+        
         var digits = new string(cnpj.Where(char.IsDigit).ToArray());
-        if (digits.Length != 14)
-            return "CNPJ deve ter 14 dígitos";
+        if (digits.Length != 14) return "CNPJ deve ter 14 dígitos";
+        
         // TODO: Implementar validação completa de CNPJ
         return null;
     }
 
     private string? ValidateCPF(string cpf)
     {
-        if (TipoDocumento != TipoDocumentoEnum.CPF)
-            return null;
-        if (string.IsNullOrWhiteSpace(cpf) && IsRequired)
-            return "CPF é obrigatório";
+        if (TipoDocumento != TipoDocumentoEnum.CPF) return null;
+        if (string.IsNullOrWhiteSpace(cpf) && IsRequired) return "CPF é obrigatório";
+        
         var digits = new string(cpf.Where(char.IsDigit).ToArray());
-        if (digits.Length != 11)
-            return "CPF deve ter 11 dígitos";
+        if (digits.Length != 11) return "CPF deve ter 11 dígitos";
+        
         // TODO: Implementar validação completa de CPF
         return null;
     }
 
     private string? ValidateCAEPF(string caepf)
     {
-        if (string.IsNullOrWhiteSpace(caepf))
-            return null;
+        if (string.IsNullOrWhiteSpace(caepf)) return null;
+        
         var digits = new string(caepf.Where(char.IsDigit).ToArray());
-        if (digits.Length != 14)
-            return "CAEPF deve ter 14 dígitos";
+        if (digits.Length != 14) return "CAEPF deve ter 14 dígitos";
+        
         return null;
     }
 
     private string? ValidateName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name) && IsRequired)
+        if (string.IsNullOrWhiteSpace(name) && IsRequired) 
             return $"{(TipoDocumento == TipoDocumentoEnum.CNPJ ? "Razão Social" : "Nome")} é obrigatório";
+        
         if (!string.IsNullOrWhiteSpace(name) && name.Length < 2)
             return "Nome deve ter pelo menos 2 caracteres";
+        
         return null;
     }
 
     private string? ValidatePhone(string phone)
     {
-        if (string.IsNullOrWhiteSpace(phone))
-            return null;
+        if (string.IsNullOrWhiteSpace(phone)) return null;
+        
         var digits = new string(phone.Where(char.IsDigit).ToArray());
         if (digits.Length < 10 || digits.Length > 11)
             return "Telefone deve ter 10 ou 11 dígitos";
+        
         return null;
     }
 
     private string? ValidateEmail(string email)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            return null;
+        if (string.IsNullOrWhiteSpace(email)) return null;
+        
         try
         {
             var addr = new System.Net.Mail.MailAddress(email);

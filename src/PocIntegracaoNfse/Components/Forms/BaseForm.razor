@@ -1,177 +1,124 @@
 ﻿@using PocIntegracaoNfse.Core.Models.Validation
-@inject ISnackbar Snackbar
 
-<MudPaper Elevation="2" Class="pa-6">
-    <MudStack Spacing="4">
-        <!-- Header -->
-        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-            <MudStack Spacing="1">
-                <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
-                    <MudIcon Icon="@Icon" Color="Color.Primary" Size="Size.Large" />
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.h4">@Title</MudText>
+<MudCard Class="@CssClass" Style="@Style">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <MudCardHeader>
+            <CardHeaderContent>
+                <div class="d-flex align-center">
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <MudIcon Icon="@Icon" Class="mr-3" Color="@IconColor" />
+                    }
+                    <div>
+                        <MudText Typo="Typo.h6">@Title</MudText>
                         @if (!string.IsNullOrEmpty(Subtitle))
                         {
-                            <MudText Typo="Typo.body1" Color="Color.Secondary">@Subtitle</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@Subtitle</MudText>
                         }
-                    </MudStack>
-                    @if (IsLoading)
+                    </div>
+                </div>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                @if (ShowValidationStatus && ValidationResult != null)
+                {
+                    @if (ValidationResult.IsValid)
                     {
-                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
                     }
-                    else if (ValidationResult != null)
+                    else if (ValidationResult.Errors.Any())
                     {
-                        <MudIcon Icon="@(ValidationResult.IsValid ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Error)"
-                                 Color="@(ValidationResult.IsValid ? Color.Success : Color.Error)" />
+                        <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" />
                     }
-                </MudStack>
-            </MudStack>
+                    else if (ValidationResult.Warnings.Any())
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" />
+                    }
+                }
+                @HeaderActions
+            </CardHeaderActions>
+        </MudCardHeader>
+    }
 
-            <!-- Botões de Ação -->
-            <MudButtonGroup Variant="Variant.Filled">
-                <MudButton StartIcon="@Icons.Material.Filled.Save"
-                           Color="Color.Primary"
-                           OnClick="HandleSave"
-                           Disabled="IsLoading">
-                    Salvar
-                </MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.CheckCircle"
-                           Color="Color.Success"
-                           OnClick="HandleValidate"
-                           Disabled="IsLoading">
-                    Validar
-                </MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Refresh"
-                           Color="Color.Secondary"
-                           OnClick="HandleClear"
-                           Disabled="IsLoading">
-                    Limpar
-                </MudButton>
-            </MudButtonGroup>
-        </MudStack>
-
-        <!-- Alertas de Validação -->
-        @if (ValidationResult != null)
+    <MudCardContent>
+        @if (ValidationResult != null && ShowValidationSummary)
         {
-            <MudAlert Severity="@(ValidationResult.IsValid ? Severity.Success : Severity.Error)"
-                      Class="mb-4">
-                <MudText Typo="Typo.h6">
-                    @(ValidationResult.IsValid ? "✓ Formulário Válido" : "✗ Formulário Inválido")
-                </MudText>
-                <MudText>
-                    @GetValidationSummary()
-                </MudText>
-            </MudAlert>
-
-            @if (ValidationResult.Errors.Any())
-            {
-                <MudExpansionPanels Elevation="2" Rounded="true">
-                    <MudExpansionPanel Text="@($"Erros ({ValidationResult.Errors.Count})")"
-                                       Icon="@Icons.Material.Filled.Error"
-                                       IsExpanded="true">
-                        <MudList T="string">
-                            @foreach (var error in ValidationResult.Errors)
-                            {
-                                <MudListItem Icon="@Icons.Material.Filled.Error"
-                                             IconColor="Color.Error">
-                                    <MudText Typo="Typo.body1">@error</MudText>
-                                </MudListItem>
-                            }
-                        </MudList>
-                    </MudExpansionPanel>
-                </MudExpansionPanels>
-            }
-
-            @if (ValidationResult.Warnings.Any())
-            {
-                <MudExpansionPanels Elevation="2" Rounded="true">
-                    <MudExpansionPanel Text="@($"Avisos ({ValidationResult.Warnings.Count})")"
-                                       Icon="@Icons.Material.Filled.Warning">
-                        <MudList T="string">
-                            @foreach (var warning in ValidationResult.Warnings)
-                            {
-                                <MudListItem Icon="@Icons.Material.Filled.Warning"
-                                             IconColor="Color.Warning">
-                                    <MudText Typo="Typo.body1">@warning</MudText>
-                                </MudListItem>
-                            }
-                        </MudList>
-                    </MudExpansionPanel>
-                </MudExpansionPanels>
-            }
+            <ValidationResume Result="ValidationResult" Class="mb-4" />
         }
 
-        <!-- Conteúdo do Formulário -->
-        <MudCard Elevation="1">
-            <MudCardContent>
-                @ChildContent
-            </MudCardContent>
-        </MudCard>
-    </MudStack>
-</MudPaper>
+        @if (IsLoading)
+        {
+            <div class="d-flex justify-center pa-4">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+        else
+        {
+            @ChildContent
+        }
+    </MudCardContent>
+
+    @if (ShowActions)
+    {
+        <MudCardActions>
+            <div class="d-flex justify-end gap-2 pa-2">
+                @if (ShowClearButton)
+                {
+                    <MudButton Variant="Variant.Text" 
+                               OnClick="OnClear"
+                               StartIcon="@Icons.Material.Filled.Clear">
+                        Limpar
+                    </MudButton>
+                }
+                @if (ShowValidateButton)
+                {
+                    <MudButton Variant="Variant.Outlined" 
+                               Color="Color.Info"
+                               OnClick="OnValidate"
+                               StartIcon="@Icons.Material.Filled.CheckCircle"
+                               Disabled="IsLoading">
+                        Validar
+                    </MudButton>
+                }
+                @if (ShowSaveButton)
+                {
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary"
+                               OnClick="OnSave"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               Disabled="IsLoading">
+                        Salvar
+                    </MudButton>
+                }
+                @Actions
+            </div>
+        </MudCardActions>
+    }
+</MudCard>
 
 @code {
-    [Parameter] public string Title { get; set; } = "Formulário";
-    [Parameter] public string? Subtitle { get; set; }
-    [Parameter] public string Icon { get; set; } = Icons.Material.Filled.Edit;
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Subtitle { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = string.Empty;
+    [Parameter] public Color IconColor { get; set; } = Color.Primary;
+    [Parameter] public string CssClass { get; set; } = string.Empty;
+    [Parameter] public string Style { get; set; } = string.Empty;
+    
     [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public bool ShowActions { get; set; } = true;
+    [Parameter] public bool ShowSaveButton { get; set; } = true;
+    [Parameter] public bool ShowValidateButton { get; set; } = true;
+    [Parameter] public bool ShowClearButton { get; set; } = true;
+    [Parameter] public bool ShowValidationStatus { get; set; } = true;
+    [Parameter] public bool ShowValidationSummary { get; set; } = true;
+    
     [Parameter] public ValidationResult? ValidationResult { get; set; }
+    
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? HeaderActions { get; set; }
+    [Parameter] public RenderFragment? Actions { get; set; }
+    
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnValidate { get; set; }
     [Parameter] public EventCallback OnClear { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    private async Task HandleSave()
-    {
-        try
-        {
-            await OnSave.InvokeAsync();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro ao salvar: {ex.Message}", Severity.Error);
-        }
-    }
-
-    private async Task HandleValidate()
-    {
-        try
-        {
-            await OnValidate.InvokeAsync();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro na validação: {ex.Message}", Severity.Error);
-        }
-    }
-
-    private async Task HandleClear()
-    {
-        try
-        {
-            await OnClear.InvokeAsync();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro ao limpar: {ex.Message}", Severity.Error);
-        }
-    }
-
-    private string GetValidationSummary()
-    {
-        if (ValidationResult == null) return "";
-
-        var summary = new List<string>();
-
-        if (ValidationResult.IsValid)
-            summary.Add("Todos os campos estão preenchidos corretamente");
-
-        if (ValidationResult.Errors.Any())
-            summary.Add($"{ValidationResult.Errors.Count} erro(s) encontrado(s)");
-
-        if (ValidationResult.Warnings.Any())
-            summary.Add($"{ValidationResult.Warnings.Count} aviso(s) encontrado(s)");
-
-        return string.Join(". ", summary);
-    }
 }
