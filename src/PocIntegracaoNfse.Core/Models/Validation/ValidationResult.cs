@@ -5,12 +5,6 @@
 /// </summary>
 public class ValidationResult
 {
-    /// <summary>Construtor padrão</summary>
-    public ValidationResult()
-    {
-
-    }
-
     /// <summary>Indica se a validação passou</summary>
     public bool IsValid { get; set; }
 

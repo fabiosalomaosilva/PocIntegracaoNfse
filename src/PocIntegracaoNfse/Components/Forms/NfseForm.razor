@@ -1,0 +1,771 @@
+﻿@using System.Globalization
+@using PocIntegracaoNfse.Models.Enums
+@using PocIntegracaoNfse.Core.Models.Validation
+@using PocIntegracaoNfse.Models.NFSe
+@using PocIntegracaoNfse.Models.DPS
+
+<BaseForm Title="Nota Fiscal de Serviços Eletrônica (NFSe)"
+          Subtitle="Formulário para visualização e edição da NFSe"
+          Icon="@Icons.Material.Filled.Receipt"
+          IsLoading="IsLoading"
+          ValidationResult="ValidationResult"
+          OnSave="HandleSave"
+          OnValidate="HandleValidate"
+          OnClear="HandleClear">
+
+    <MudTabs Elevation="2" Rounded="true" Color="Color.Primary" PanelClass="pa-4">
+
+        <!-- Tab 1: Informações Gerais -->
+        <MudTabPanel Text="Informações Gerais" Icon="@Icons.Material.Filled.Info">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">Dados de Identificação da NFSe</MudText>
+                </MudItem>
+
+                <!-- ID da NFSe -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Id"
+                                  Label="ID da NFSe"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="53"
+                                  ReadOnly="true"
+                                  HelperText="Identificador único gerado automaticamente" />
+                </MudItem>
+
+                <!-- Número NFSe -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.NNFSe"
+                                  Label="Número da NFSe"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="13"
+                                  ReadOnly="true"
+                                  HelperText="Número sequencial gerado pelo sistema" />
+                </MudItem>
+
+                <!-- Localização Emissor -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.XLocEmi"
+                                  Label="Município Emissor"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="150"
+                                  Validation="@(new Func<string, string?>(ValidateLocalizacao))" />
+                </MudItem>
+
+                <!-- Localização Prestação -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.XLocPrestacao"
+                                  Label="Local da Prestação"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="150"
+                                  Validation="@(new Func<string, string?>(ValidateLocalizacao))" />
+                </MudItem>
+
+                <!-- Código Local Incidência -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.CLocIncid"
+                                  Label="Código Município Incidência (IBGE)"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="7"
+                                  Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))"
+                                  HelperText="Código IBGE do município de incidência do ISSQN" />
+                </MudItem>
+
+                <!-- Descrição Local Incidência -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.XLocIncid"
+                                  Label="Descrição Município Incidência"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="150"
+                                  HelperText="Nome do município de incidência" />
+                </MudItem>
+
+                <!-- Versão Aplicativo -->
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="Model.InfNFSe.VerAplic"
+                                  Label="Versão do Aplicativo"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="20"
+                                  ReadOnly="true" />
+                </MudItem>
+
+                <!-- Ambiente Gerador -->
+                <MudItem xs="12" md="4">
+                    <MudSelect @bind-Value="Model.InfNFSe.AmbGer"
+                               Label="Ambiente Gerador"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true"
+                               ReadOnly="true">
+                        <MudSelectItem Value="AmbienteGeradorNFSe.Prefeitura">Prefeitura</MudSelectItem>
+                        <MudSelectItem Value="AmbienteGeradorNFSe.SistemaNacional">Sistema Nacional</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Tipo Emissão -->
+                <MudItem xs="12" md="4">
+                    <MudSelect @bind-Value="Model.InfNFSe.TpEmis"
+                               Label="Tipo de Emissão"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true">
+                        <MudSelectItem Value="TipoEmissao.EmissaoNormalNacional">Emissão Normal Nacional</MudSelectItem>
+                        <MudSelectItem Value="TipoEmissao.EmissaoOriginalMunicipal">Emissão Original Municipal</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Processo Emissão -->
+                <MudItem xs="12" md="6">
+                    <MudSelect @bind-Value="Model.InfNFSe.ProcEmi"
+                               Label="Processo de Emissão"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true">
+                        <MudSelectItem Value="ProcessoEmissao.AplicativoContribuinte">Aplicativo do Contribuinte (Web Service)</MudSelectItem>
+                        <MudSelectItem Value="ProcessoEmissao.AplicativoFiscoWeb">Aplicativo do Fisco (Web)</MudSelectItem>
+                        <MudSelectItem Value="ProcessoEmissao.AplicativoFiscoApp">Aplicativo do Fisco (App)</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Status -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.CStat"
+                                  Label="Código do Status"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  ReadOnly="true"
+                                  HelperText="Status do processamento da NFSe" />
+                </MudItem>
+
+                <!-- Data Processamento -->
+                <MudItem xs="12" md="6">
+                    <MudDatePicker @bind-Date="DataProcessamento"
+                                   Label="Data de Processamento"
+                                   Variant="Variant.Outlined"
+                                   FullWidth="true"
+                                   Required="true"
+                                   ReadOnly="true"
+                                   DateFormat="dd/MM/yyyy" />
+                </MudItem>
+
+                <!-- Número DFSe -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.NDFSe"
+                                  Label="Número DFSe"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="13"
+                                  ReadOnly="true"
+                                  HelperText="Número sequencial do documento gerado" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+
+        <!-- Tab 2: Emitente -->
+        <MudTabPanel Text="Emitente" Icon="@Icons.Material.Filled.Business">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">Dados do Emitente da NFSe</MudText>
+                </MudItem>
+
+                <!-- Tipo de Documento -->
+                <MudItem xs="12" md="4">
+                    <MudRadioGroup @bind-SelectedOption="TipoDocumentoEmitente" T="string">
+                        <MudRadio Option="@("CNPJ")" T="string">CNPJ</MudRadio>
+                        <MudRadio Option="@("CPF")" T="string">CPF</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
+
+                <!-- CNPJ ou CPF -->
+                <MudItem xs="12" md="8">
+                    @if (TipoDocumentoEmitente == "CNPJ")
+                    {
+                        <MudTextField @bind-Value="Model.InfNFSe.Emit.CNPJ"
+                                      Label="CNPJ"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Required="true"
+                                      MaxLength="14"
+                                      Validation="@(new Func<string, string?>(ValidateCNPJ))"
+                                      Mask="@(new PatternMask("00.000.000/0000-00"))" />
+                    }
+                    else
+                    {
+                        <MudTextField @bind-Value="Model.InfNFSe.Emit.CPF"
+                                      Label="CPF"
+                                      Variant="Variant.Outlined"
+                                      FullWidth="true"
+                                      Required="true"
+                                      MaxLength="11"
+                                      Validation="@(new Func<string, string?>(ValidateCPF))"
+                                      Mask="@(new PatternMask("000.000.000-00"))" />
+                    }
+                </MudItem>
+
+                <!-- Inscrição Municipal -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.IM"
+                                  Label="Inscrição Municipal"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="15" />
+                </MudItem>
+
+                <!-- Nome/Razão Social -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.XNome"
+                                  Label="@(TipoDocumentoEmitente == "CNPJ" ? "Razão Social" : "Nome Completo")"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="300"
+                                  Validation="@(new Func<string, string?>(ValidateNome))" />
+                </MudItem>
+
+                <!-- Nome Fantasia -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.XFant"
+                                  Label="Nome Fantasia"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="60" />
+                </MudItem>
+
+                <!-- Telefone -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.Fone"
+                                  Label="Telefone"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="20"
+                                  Validation="@(new Func<string, string?>(ValidateTelefone))"
+                                  Mask="@(new PatternMask("(00) 00000-0000"))" />
+                </MudItem>
+
+                <!-- E-mail -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.Email"
+                                  Label="E-mail"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="60"
+                                  InputType="InputType.Email"
+                                  Validation="@(new Func<string, string?>(ValidateEmail))" />
+                </MudItem>
+
+                <!-- Endereço -->
+                <MudItem xs="12">
+                    <MudDivider Class="my-4" />
+                    <MudText Typo="Typo.h6" Class="mb-4">Endereço do Emitente</MudText>
+                </MudItem>
+
+                <MudItem xs="12" md="8">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.XLgr"
+                                  Label="Logradouro"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="200" />
+                </MudItem>
+
+                <MudItem xs="12" md="4">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.Nro"
+                                  Label="Número"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="10" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.XCpl"
+                                  Label="Complemento"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="60" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.XBairro"
+                                  Label="Bairro"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="60" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.CMun"
+                                  Label="Código Município (IBGE)"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="7"
+                                  Validation="@(new Func<string, string?>(ValidateCodigoMunicipio))" />
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudSelect @bind-Value="Model.InfNFSe.Emit.EnderNac.UF"
+                               Label="UF"
+                               Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Required="true">
+                        @foreach (var uf in Enum.GetValues<UnidadeFederacao>())
+                        {
+                            <MudSelectItem Value="uf">@uf.ToString()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12" md="3">
+                    <MudTextField @bind-Value="Model.InfNFSe.Emit.EnderNac.CEP"
+                                  Label="CEP"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Required="true"
+                                  MaxLength="8"
+                                  Validation="@(new Func<string, string?>(ValidateCEP))"
+                                  Mask="@(new PatternMask("00000-000"))" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+
+        <!-- Tab 3: Valores -->
+        <MudTabPanel Text="Valores" Icon="@Icons.Material.Filled.AttachMoney">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">Valores da NFSe</MudText>
+                </MudItem>
+
+                <!-- Valor Cálculo D/R -->
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="Model.InfNFSe.Valores.VCalcDR"
+                                     Label="Valor Cálculo Dedução/Redução"
+                                     Variant="Variant.Outlined"
+                                     FullWidth="true"
+                                     Format="C2"
+                                     Culture="CultureInfo.InvariantCulture"
+                                     Min="0"
+                                     HelperText="Valor de dedução/redução da base de cálculo" />
+                </MudItem>
+
+                <!-- Tipo Benefício Municipal -->
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="Model.InfNFSe.Valores.TpBM"
+                                  Label="Tipo de Benefício Municipal"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  MaxLength="40" />
+                </MudItem>
+
+                <!-- Valor Cálculo BM -->
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="Model.InfNFSe.Valores.VCalcBM"
+                                     Label="Valor Cálculo Benefício Municipal"
+                                     Variant="Variant.Outlined"
+                                     FullWidth="true"
+                                     Format="C2"
+                                     Culture="CultureInfo.InvariantCulture"
+                                     Min="0"
+                                     HelperText="Valor do benefício municipal" />
+                </MudItem>
+
+                <!-- Base de Cálculo -->
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="Model.InfNFSe.Valores.VBC"
+                                     Label="Base de Cálculo do ISSQN"
+                                     Variant="Variant.Outlined"
+                                     FullWidth="true"
+                                     Format="C2"
+                                     Culture="CultureInfo.InvariantCulture"
+                                     Min="0"
+                                     ReadOnly="true" />
+                </MudItem>
+
+                <!-- Alíquota -->
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="Model.InfNFSe.Valores.PAliqAplic"
+                                     Label="Alíquota Aplicada (%)"
+                                     Variant="Variant.Outlined"
+                                     FullWidth="true"
+                                     Format="N2"
+                                     Min="0"
+                                     Max="100"
+                                     ReadOnly="true" />
+                </MudItem>
+
+                <!-- Valor ISSQN -->
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="Model.InfNFSe.Valores.VISSQN"
+                                     Label="Valor do ISSQN"
+                                     Variant="Variant.Outlined"
+                                     FullWidth="true"
+                                     Format="C2"
+                                     Culture="CultureInfo.InvariantCulture"
+                                     Min="0"
+                                     ReadOnly="true" />
+                </MudItem>
+
+                <!-- Valor Total Retenções -->
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="Model.InfNFSe.Valores.VTotalRet"
+                                     Label="Valor Total Retenções"
+                                     Variant="Variant.Outlined"
+                                     FullWidth="true"
+                                     Format="C2"
+                                     Culture="CultureInfo.InvariantCulture"
+                                     Min="0"
+                                     ReadOnly="true" />
+                </MudItem>
+
+                <!-- Valor Líquido -->
+                <MudItem xs="12" md="6">
+                    <MudNumericField @bind-Value="Model.InfNFSe.Valores.VLiq"
+                                     Label="Valor Líquido"
+                                     Variant="Variant.Outlined"
+                                     FullWidth="true"
+                                     Format="C2"
+                                     Culture="CultureInfo.InvariantCulture"
+                                     Min="0"
+                                     Required="true"
+                                     ReadOnly="true"
+                                     Class="mud-theme-success" />
+                </MudItem>
+
+                <!-- Informações Adicionais -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="Model.InfNFSe.Valores.XOutInf"
+                                  Label="Informações Adicionais"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Lines="3"
+                                  MaxLength="2000"
+                                  HelperText="Uso da Administração Tributária Municipal" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+
+        <!-- Tab 4: Tributação -->
+        <MudTabPanel Text="Tributação" Icon="@Icons.Material.Filled.AccountBalance">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">Informações de Tributação</MudText>
+                </MudItem>
+
+                <!-- Tributação Nacional -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="Model.InfNFSe.XTribNac"
+                                  Label="Descrição da Tributação Nacional"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Lines="3"
+                                  MaxLength="600"
+                                  ReadOnly="true"
+                                  HelperText="Descrição automática baseada no código de serviço" />
+                </MudItem>
+
+                <!-- Tributação Municipal -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="Model.InfNFSe.XTribMun"
+                                  Label="Descrição da Tributação Municipal"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Lines="3"
+                                  MaxLength="600"
+                                  ReadOnly="true"
+                                  HelperText="Descrição específica do município" />
+                </MudItem>
+
+                <!-- Descrição NBS -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="Model.InfNFSe.XNBS"
+                                  Label="Descrição do Código NBS"
+                                  Variant="Variant.Outlined"
+                                  FullWidth="true"
+                                  Lines="2"
+                                  MaxLength="600"
+                                  ReadOnly="true"
+                                  HelperText="Nomenclatura Brasileira de Serviços" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+
+        <!-- Tab 5: DPS Origem -->
+        <MudTabPanel Text="DPS Origem" Icon="@Icons.Material.Filled.Assignment">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-4">DPS que Originou esta NFSe</MudText>
+                    <MudAlert Severity="Severity.Info" Class="mb-4">
+                        A DPS (Declaração de Prestação de Serviços) é o documento que deu origem a esta NFSe.
+                        Estes dados são somente leitura e refletem as informações da DPS original.
+                    </MudAlert>
+                </MudItem>
+
+                <!-- Componente DPS (somente leitura) -->
+                <MudItem xs="12">
+                    <MudCard Elevation="2">
+                        <MudCardContent>
+                            <MudText Typo="Typo.h6" Class="mb-3">
+                                <MudIcon Icon="@Icons.Material.Filled.Assignment" Class="mr-2" />
+                                DPS Nº @Model.InfNFSe.DPS.InfDPS?.NDPS - Série @Model.InfNFSe.DPS.InfDPS?.Serie
+                            </MudText>
+
+                            @if (Model.InfNFSe.DPS.InfDPS != null)
+                            {
+                                <MudSimpleTable Striped="true" Dense="true">
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>ID:</strong></td>
+                                            <td>@Model.InfNFSe.DPS.InfDPS.Id</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data Emissão:</strong></td>
+                                            <td>@Model.InfNFSe.DPS.InfDPS.DhEmi.ToString("dd/MM/yyyy HH:mm")</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data Competência:</strong></td>
+                                            <td>@Model.InfNFSe.DPS.InfDPS.DCompet.ToString("dd/MM/yyyy")</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ambiente:</strong></td>
+                                            <td>@(Model.InfNFSe.DPS.InfDPS.TpAmb == TipoAmbiente.Producao ? "Produção" : "Homologação")</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Emitente:</strong></td>
+                                            <td>@Model.InfNFSe.DPS.InfDPS.TpEmit</td>
+                                        </tr>
+                                    </tbody>
+                                </MudSimpleTable>
+                            }
+
+                            <MudButton Variant="Variant.Outlined"
+                                       StartIcon="@Icons.Material.Filled.Visibility"
+                                       OnClick="VisualizarDpsCompleta"
+                                       Class="mt-3">
+                                Ver DPS Completa
+                            </MudButton>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+    </MudTabs>
+</BaseForm>
+
+@code {
+    [Parameter] public NfseModel Model { get; set; } = new();
+    [Parameter] public EventCallback<NfseModel> ModelChanged { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public ValidationResult? ValidationResult { get; set; }
+    [Parameter] public EventCallback<NfseModel> OnSave { get; set; }
+    [Parameter] public EventCallback<NfseModel> OnValidate { get; set; }
+    [Parameter] public EventCallback OnClear { get; set; }
+
+    private string TipoDocumentoEmitente { get; set; } = "CNPJ";
+
+    // Propriedades auxiliares para binding
+    private DateTime? DataProcessamento
+    {
+        get => Model.InfNFSe?.DhProc;
+        set
+        {
+            if (Model.InfNFSe != null && value.HasValue)
+            {
+                Model.InfNFSe.DhProc = value.Value;
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Inicializar model se necessário
+        if (Model.InfNFSe == null)
+        {
+            InitializeDefaultModel();
+        }
+
+        // Determinar tipo de documento do emitente
+        if (!string.IsNullOrEmpty(Model.InfNFSe.Emit.CNPJ))
+        {
+            TipoDocumentoEmitente = "CNPJ";
+        }
+        else if (!string.IsNullOrEmpty(Model.InfNFSe.Emit.CPF))
+        {
+            TipoDocumentoEmitente = "CPF";
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Gerenciar CNPJ/CPF exclusivos
+        if (TipoDocumentoEmitente == "CNPJ")
+        {
+            Model.InfNFSe.Emit.CPF = null;
+        }
+        else if (TipoDocumentoEmitente == "CPF")
+        {
+            Model.InfNFSe.Emit.CNPJ = null;
+        }
+
+        await ModelChanged.InvokeAsync(Model);
+    }
+
+    private void InitializeDefaultModel()
+    {
+        Model = new NfseModel
+            {
+                InfNFSe = new InfNfseModel
+                {
+                    Id = $"NFS{DateTime.Now:yyyyMMddHHmmss}",
+                    XLocEmi = string.Empty,
+                    XLocPrestacao = string.Empty,
+                    NNFSe = "1",
+                    VerAplic = "1.00",
+                    AmbGer = AmbienteGeradorNFSe.SistemaNacional,
+                    TpEmis = TipoEmissao.EmissaoNormalNacional,
+                    ProcEmi = ProcessoEmissao.AplicativoContribuinte,
+                    CStat = 100,
+                    DhProc = DateTime.Now,
+                    NDFSe = "1",
+                    Emit = new EmitenteNfseModel
+                    {
+                        XNome = string.Empty,
+                        EnderNac = new EnderecoEmitenteModel
+                        {
+                            XLgr = string.Empty,
+                            Nro = string.Empty,
+                            XBairro = string.Empty,
+                            CMun = string.Empty,
+                            UF = UnidadeFederacao.SP,
+                            CEP = string.Empty
+                        }
+                    },
+                    Valores = new ValoresNfseModel
+                    {
+                        VLiq = 0
+                    },
+                    DPS = new DpsModel()
+                }
+            };
+    }
+
+    private async Task HandleSave()
+    {
+        await OnSave.InvokeAsync(Model);
+    }
+
+    private async Task HandleValidate()
+    {
+        await OnValidate.InvokeAsync(Model);
+    }
+
+    private async Task HandleClear()
+    {
+        InitializeDefaultModel();
+        TipoDocumentoEmitente = "CNPJ";
+        await OnClear.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private void VisualizarDpsCompleta()
+    {
+        // TODO: Implementar navegação para visualização completa da DPS
+        // Poderia abrir em modal, nova aba, ou navegar para página específica
+    }
+
+    // Validações
+    private string? ValidateLocalizacao(string localizacao)
+    {
+        if (string.IsNullOrWhiteSpace(localizacao))
+            return "Localização é obrigatória";
+        if (localizacao.Length > 150)
+            return "Localização deve ter no máximo 150 caracteres";
+        return null;
+    }
+
+    private string? ValidateCodigoMunicipio(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+            return null; // Opcional em alguns casos
+        if (codigo.Length != 7 || !codigo.All(char.IsDigit))
+            return "Código deve ter 7 dígitos";
+        return null;
+    }
+
+    private string? ValidateCNPJ(string cnpj)
+    {
+        if (TipoDocumentoEmitente != "CNPJ")
+            return null;
+        if (string.IsNullOrWhiteSpace(cnpj))
+            return "CNPJ é obrigatório";
+        var digits = new string(cnpj.Where(char.IsDigit).ToArray());
+        if (digits.Length != 14)
+            return "CNPJ deve ter 14 dígitos";
+        return null;
+    }
+
+    private string? ValidateCPF(string cpf)
+    {
+        if (TipoDocumentoEmitente != "CPF")
+            return null;
+        if (string.IsNullOrWhiteSpace(cpf))
+            return "CPF é obrigatório";
+        var digits = new string(cpf.Where(char.IsDigit).ToArray());
+        if (digits.Length != 11)
+            return "CPF deve ter 11 dígitos";
+        return null;
+    }
+
+    private string? ValidateNome(string nome)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+            return "Nome/Razão Social é obrigatório";
+        if (nome.Length > 300)
+            return "Nome deve ter no máximo 300 caracteres";
+        return null;
+    }
+
+    private string? ValidateTelefone(string telefone)
+    {
+        if (string.IsNullOrWhiteSpace(telefone))
+            return null; // Opcional
+        var digits = new string(telefone.Where(char.IsDigit).ToArray());
+        if (digits.Length < 6 || digits.Length > 20)
+            return "Telefone deve ter entre 6 e 20 dígitos";
+        return null;
+    }
+
+    private string? ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return null; // Opcional
+        if (email.Length > 60)
+            return "E-mail deve ter no máximo 60 caracteres";
+        if (!email.Contains("@") || !email.Contains("."))
+            return "E-mail deve ter formato válido";
+        return null;
+    }
+
+    private string? ValidateCEP(string cep)
+    {
+        if (string.IsNullOrWhiteSpace(cep))
+            return "CEP é obrigatório";
+        var digits = new string(cep.Where(char.IsDigit).ToArray());
+        if (digits.Length != 8)
+            return "CEP deve ter 8 dígitos";
+        return null;
+    }
+}
